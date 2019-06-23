@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "639532194642",
+    "firebase_url": "https://team-activity-tracker.firebaseio.com",
+    "project_id": "team-activity-tracker",
+    "storage_bucket": "team-activity-tracker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639532194642:android:1ce672d3603ed4cd",
+        "android_client_info": {
+          "package_name": "com.example.teamactivitytracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639532194642-ntp8mjq7s34i4tnl60bkabpg43htqsrn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.teamactivitytracker",
+            "certificate_hash": "669a6f77e974339ffe68368d5b10ac223e961f0b"
+          }
+        },
+        {
+          "client_id": "639532194642-16gnf378dvgsit0a4p3m1h5shjccgba0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmqGST59JL3h5fiYFOiaz_RH7FUqwDC64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639532194642-16gnf378dvgsit0a4p3m1h5shjccgba0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "639532194642-ripeak2v5o8m8gotjqhmg69v1lvt8vha.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nategreat13.Team-Activity-Tracker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

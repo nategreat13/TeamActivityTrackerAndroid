@@ -1,0 +1,21 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#000080</item>
+        <item name="colorPrimaryDark">#000080</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="MenuTheme" parent="@style/Widget.AppCompat.ActionButton.Overflow" >
+        <item name="android:tint">#ffffff</item>
+    </style>
+
+
+</resources>

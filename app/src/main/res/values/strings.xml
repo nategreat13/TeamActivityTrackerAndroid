@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Team Activity Tracker</string>
+    <string name="email_address">Email Address</string>
+    <string name="login">Login</string>
+    <string name="dont_have_an_account">Don\'t have an account?</string>
+    <string name="register">Register</string>
+    <string name="password">Password</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="register_now">Register Now</string>
+    <string name="login_error">Error logging in</string>
+    <string name="first_name_empty">Please enter your first name</string>
+    <string name="last_name_empty">Please enter your last name</string>
+    <string name="email_invalid">Email is invalid</string>
+    <string name="password_invalid">Password is invalid</string>
+    <string name="registration_error">Registration Error</string>
+    <string name="back">Back</string>
+</resources>
