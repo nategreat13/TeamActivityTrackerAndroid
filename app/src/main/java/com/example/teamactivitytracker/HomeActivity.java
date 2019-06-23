@@ -1,10 +1,10 @@
 package com.example.teamactivitytracker;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.teamactivitytracker.Model.DB;
+import com.example.teamactivitytracker.Model.ProfileType;
 import com.example.teamactivitytracker.Model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;

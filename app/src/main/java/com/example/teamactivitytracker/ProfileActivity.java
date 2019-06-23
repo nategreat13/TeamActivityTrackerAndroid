@@ -1,19 +1,22 @@
 package com.example.teamactivitytracker;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import com.example.teamactivitytracker.Model.Coach;
 import com.example.teamactivitytracker.Model.DB;
 import com.example.teamactivitytracker.Model.Player;
 import com.example.teamactivitytracker.Model.ProfileType;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +39,20 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Teams");
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+
 
         listView = findViewById(R.id.list);
         db = new DB();
@@ -115,12 +132,6 @@ public class ProfileActivity extends AppCompatActivity {
         if (index < teamIDs.length) {
             String tid = teamIDs[index];
             // Go to profile page for pid
-            /*
-            Intent intent = new Intent(this, ProfileActivity.class);
-            intent.putExtra("PROFILE_TYPE", "Player");
-            intent.putExtra("PID", pid);
-            startActivity(intent);
-            */
         }
     }
 
