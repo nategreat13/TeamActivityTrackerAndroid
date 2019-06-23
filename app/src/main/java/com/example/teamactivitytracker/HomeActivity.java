@@ -1,35 +1,26 @@
 package com.example.teamactivitytracker;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+
+import com.example.teamactivitytracker.Model.DB;
+import com.example.teamactivitytracker.Model.User;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import com.example.teamactivitytracker.Model.DB;
-import com.example.teamactivitytracker.Model.ProfileType;
-import com.example.teamactivitytracker.Model.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -49,10 +40,18 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Home");
+        setSupportActionBar(toolbar);
 
-        //Toolbar toolbar = findViewById(R.id.toolbar);
-        //toolbar.setTitle("");
-        //setSupportActionBar(toolbar);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
 
         listView = findViewById(R.id.list);
 
@@ -60,7 +59,7 @@ public class HomeActivity extends AppCompatActivity {
 
         db = new DB();
 
-       // Get User
+        // Get User
         String currentUserEmail = getIntent().getStringExtra("CURRENT_USER_EMAIL");
         if (currentUserEmail != null) {
             db.getUser(currentUserEmail.replace(".", ""), loadedUser -> setUser(loadedUser));
@@ -86,7 +85,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         };
 
-
         // Assign adapter to ListView
         listView.setAdapter(adapter);
 
@@ -100,26 +98,7 @@ public class HomeActivity extends AppCompatActivity {
             }
 
         });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.layout.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_add:
-                return true;
-            case R.id.action_settings:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     public User getUser() {
@@ -128,15 +107,12 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setUser(User user) {
         this.user = user;
-        //updateToolBarTitle();
+        updateToolbarTitle();
         updateListView();
     }
 
-    public void updateToolBarTitle() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(user.getFirstName() + " " + user.getLastName());
-        }
+    public void updateToolbarTitle() {
+        getSupportActionBar().setTitle(user.getFirstName() + " " + user.getLastName());
     }
 
     public void updateListView() {
@@ -178,6 +154,5 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
+
 }
-
-

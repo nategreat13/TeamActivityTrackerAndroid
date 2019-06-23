@@ -16,4 +16,6 @@
     <string name="password_invalid">Password is invalid</string>
     <string name="registration_error">Registration Error</string>
     <string name="back">Back</string>
+    <string name="title_activity_test_basic">TestBasicActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
 </resources>
