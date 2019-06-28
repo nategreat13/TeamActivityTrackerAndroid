@@ -15,11 +15,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.teamactivitytracker.Model.DB;
+import com.example.teamactivitytracker.Model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -29,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText lastNameText;
     private EditText emailText;
     private EditText passwordText;
+    private DB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +44,12 @@ public class RegisterActivity extends AppCompatActivity {
         lastNameText = findViewById(R.id.lastNameTextField);
 
         mAuth = FirebaseAuth.getInstance();
+
+        db = new DB();
     }
 
     public void back(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        finish();
     }
 
     public void register(View view) {
@@ -77,11 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                            intent.putExtra("CURRENTT_USER_EMAIL", user.getEmail());
-                            startActivity(intent);
+                            db.addUser(email.replace(".", ""), email, firstName, lastName, newUser -> registerSuccessful(newUser));
                         } else {
                             // If sign in fails, display a message to the user.
                             errorLabel.setText(getString(R.string.registration_error));
@@ -93,6 +92,12 @@ public class RegisterActivity extends AppCompatActivity {
 
     public static boolean isValidEmail(CharSequence target) {
         return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
+    }
+
+    public void registerSuccessful(User user) {
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+        intent.putExtra("CURRENT_USER_EMAIL", user.getEmail());
+        startActivity(intent);
     }
 
     @Override

@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     android:background="#888888"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".AddProfileActivity"
-    tools:showIn="@layout/activity_add_profile">
+    tools:context=".AddTeamActivity"
+    tools:showIn="@layout/activity_add_team">
 
     <TextView
         android:id="@+id/textView"
@@ -15,7 +15,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="32dp"
         android:gravity="center_horizontal"
-        android:text="@string/add_profile"
+        android:text="@string/add_team"
         android:textColor="@color/colorPrimary"
         android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,21 +51,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:onClick="playerRadioButtonSelected"
-                android:text="@string/player"
+                android:onClick="newTeamRadioButtonSelected"
+                android:text="@string/create_new_team"
                 android:textSize="18sp" />
 
             <Space
-                android:layout_width="32dp"
+                android:layout_width="16dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
             <RadioButton
-                android:id="@+id/coachRadioButton"
+                android:id="@+id/existingTeamRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="coachRadioButtonSelected"
-                android:text="@string/coach"
+                android:onClick="existingTeamRadioButtonSelected"
+                android:text="@string/join_existing_team"
                 android:textSize="18sp" />
         </RadioGroup>
 
@@ -74,20 +74,11 @@
             android:layout_height="16dp" />
 
         <EditText
-            android:id="@+id/firstNameTextField"
-            android:layout_width="347dp"
-            android:layout_height="52dp"
-            android:ems="10"
-            android:hint="@string/first_name"
-            android:inputType="text"
-            android:selectAllOnFocus="false" />
-
-        <EditText
-            android:id="@+id/lastNameTextField"
+            android:id="@+id/teamNameTextField"
             android:layout_width="347dp"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/last_name"
+            android:hint="@string/team_name"
             android:inputType="text" />
 
         <EditText
@@ -95,16 +86,8 @@
             android:layout_width="347dp"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/team_id_optional"
+            android:hint="@string/team_id"
             android:inputType="text" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/enter_team_id"
-            android:textColor="@color/colorPrimary" />
 
         <Space
             android:layout_width="match_parent"
@@ -116,7 +99,7 @@
             android:layout_height="wrap_content"
             android:background="#000080"
             android:onClick="addButtonPressed"
-            android:text="@string/add_player"
+            android:text="@string/create_new_team"
             android:textColor="#FFFFFF" />
 
         <TextView
@@ -129,4 +112,5 @@
 
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

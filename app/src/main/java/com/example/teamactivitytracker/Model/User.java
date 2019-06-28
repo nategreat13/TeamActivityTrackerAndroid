@@ -1,8 +1,10 @@
 package com.example.teamactivitytracker.Model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class User {
+@SuppressWarnings("serial")
+public class User implements Serializable {
 
     private String uid;
     private String email;
@@ -36,6 +38,14 @@ public class User {
         this.lastName = "";
         this.players = new HashMap<>();
         this.coaches = new HashMap<>();
+    }
+
+    public void addPlayer(String pid, String playerName) {
+        players.put(pid, playerName);
+    }
+
+    public void addCoach(String cid, String coachName) {
+        coaches.put(cid, coachName);
     }
 
     public String getUid() {

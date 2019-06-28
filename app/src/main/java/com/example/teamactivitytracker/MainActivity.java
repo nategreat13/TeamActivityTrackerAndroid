@@ -35,20 +35,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         errorLabel = findViewById(R.id.errorLabel);
-        emailText = findViewById(R.id.emailTextField);
+        emailText = findViewById(R.id.firstNameTextField);
         passwordText = findViewById(R.id.passwordTextField);
         mAuth = FirebaseAuth.getInstance();
-
-
-        emailText.setText("nategreat13@hotmail.com");
-        passwordText.setText("Sparta#13");
-        login(emailText);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);

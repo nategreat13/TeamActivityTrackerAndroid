@@ -1,11 +1,13 @@
 package com.example.teamactivitytracker;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.teamactivitytracker.Model.Coach;
 import com.example.teamactivitytracker.Model.DB;
 import com.example.teamactivitytracker.Model.Player;
 import com.example.teamactivitytracker.Model.ProfileType;
+import com.example.teamactivitytracker.Model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -42,17 +44,8 @@ public class ProfileActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Teams");
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         listView = findViewById(R.id.list);
         db = new DB();
@@ -103,6 +96,21 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    public void updateToolbarTitle() {
+        if (profileType == ProfileType.Player) {
+            getSupportActionBar().setTitle(player.getFirstName() + " " + player.getLastName());
+        }
+        else if (profileType == ProfileType.Coach) {
+            getSupportActionBar().setTitle(coach.getFirstName() + " " + coach.getLastName());
+        }
+    }
+
     public void updateListView() {
 
         if (profileType == ProfileType.Player) {
@@ -135,14 +143,52 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    public Coach getCaoch() {
+    public void goToAdd(View view) {
+        Intent intent = new Intent(this, AddTeamActivity.class);
+        if (profileType == ProfileType.Player) {
+            intent.putExtra("PROFILE_TYPE", "Player");
+            intent.putExtra("PLAYER", getPlayer());
+        }
+        else {
+            intent.putExtra("PROFILE_TYPE", "Coach");
+            intent.putExtra("COACH", getCoach());
+        }
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                if (profileType == ProfileType.Player) {
+                    Player updatedPlayer = (Player) data.getSerializableExtra("PLAYER");
+                    if (updatedPlayer != null) {
+                        setPlayer(updatedPlayer);
+                        updateListView();
+                    }
+                }
+                else {
+                    Coach updatedCoach = (Coach) data.getSerializableExtra("COACH");
+                    if (updatedCoach != null) {
+                        setCoach(updatedCoach);
+                        updateListView();
+                    }
+                }
+            }
+        }
+    }
+
+    public Coach getCoach() {
         return coach;
     }
 
     public void setCoach(Coach coach) {
         this.coach = coach;
         this.profileType = ProfileType.Coach;
-        updateListView();
+        if (coach != null) {
+            updateToolbarTitle();
+            updateListView();
+        }
     }
 
     public Player getPlayer() {
@@ -152,6 +198,9 @@ public class ProfileActivity extends AppCompatActivity {
     public void setPlayer(Player player) {
         this.player = player;
         this.profileType = ProfileType.Player;
-        updateListView();
+        if (player != null) {
+            updateToolbarTitle();
+            updateListView();
+        }
     }
 }

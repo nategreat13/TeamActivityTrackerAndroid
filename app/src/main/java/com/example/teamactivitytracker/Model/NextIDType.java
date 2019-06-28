@@ -1,4 +1,8 @@
 package com.example.teamactivitytracker.Model;
 
-public class NextIDType {
+public enum NextIDType {
+    player,
+    coach,
+    activity,
+    completedActivity
 }
