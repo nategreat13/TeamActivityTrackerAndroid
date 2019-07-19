@@ -80,7 +80,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         };
 
-
         // Assign adapter to ListView
         listView.setAdapter(adapter);
 
@@ -139,7 +138,17 @@ public class ProfileActivity extends AppCompatActivity {
     public void teamSelected(int index) {
         if (index < teamIDs.length) {
             String tid = teamIDs[index];
-            // Go to profile page for pid
+            Intent intent = new Intent(this, TeamHomeActivity.class);
+            if (profileType == ProfileType.Player) {
+                intent.putExtra("PROFILE_TYPE", "PLAYER");
+                intent.putExtra("PLAYER", getPlayer());
+            }
+            else {
+                intent.putExtra("PROFILE_TYPE", "COACH");
+                intent.putExtra("COACH", getCoach());
+            }
+            intent.putExtra("TEAM_ID", tid);
+            startActivity(intent);
         }
     }
 

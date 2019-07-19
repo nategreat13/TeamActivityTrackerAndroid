@@ -43,4 +43,29 @@
     <string name="error_joining_team">Error Joining Team</string>
     <string name="error_creating_team">Error Creating Team</string>
     <string name="logout">Logout</string>
+    <string name="title_activity_team_home">TeamHomeActivity</string>
+    <string name="title_leaderboard">Leaderboard</string>
+    <string name="title_activities">Activities</string>
+    <string name="title_roster">Roster</string>
+    <string name="title_home">Home</string>
+    <string name="Period">Period</string>
+    <string name="Total">Total</string>
+    <string name="add_new_activity">Add New Activity</string>
+    <string name="limit">Limit</string>
+    <string name="per">Per</string>
+    <string name="add_activity">Add Actvity</string>
+    <string name="activity_name">Activity Name</string>
+    <string name="activity_description">Activity Description</string>
+    <string name="title_activity_add_activity">AddActivityActivity</string>
+    <string name="activity_name_required">Name Required</string>
+    <string name="activity_description_required">Description Required</string>
+    <string name="activity_limit_required">Limit Required</string>
+    <string name="activity_limit_must_be_number">Limit must be a number</string>
+    <string name="activity_limit_cant_be_zero">Limit cant be zero</string>
+
+    <string-array name="limit_arrays">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+    </string-array>
 </resources>

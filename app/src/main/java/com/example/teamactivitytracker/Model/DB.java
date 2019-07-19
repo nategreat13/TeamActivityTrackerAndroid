@@ -2,6 +2,7 @@ package com.example.teamactivitytracker.Model;
 
 import androidx.annotation.NonNull;
 
+import com.example.teamactivitytracker.ActivitiesFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -9,8 +10,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DB {
@@ -310,7 +314,7 @@ public class DB {
         coachInfo.put(cid, coachName);
 
         HashMap<String, Object> data = new HashMap<>();
-        data.put("TeamName", teamName);
+        data.put("Name", teamName);
         data.put("Coaches", coachInfo);
 
         db.collection("Teams").document(tid)
@@ -444,6 +448,38 @@ public class DB {
         });
     }
 
+    public void getTeamActivities(String tid, ActivitiesCallback activitiesCallback) {
+        Query query = db.collection("Activities").whereEqualTo("tid", tid);
+
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                Activity[] activities = new Activity[queryDocumentSnapshots.getDocuments().size()];
+                int i = 0;
+                for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
+                    Map<String, Object> data = snapshot.getData();
+                    String aid = snapshot.getId();
+                    String name = data.get("Name").toString();
+                    String description = data.get("Description").toString();
+                    int points = Integer.parseInt(data.get("Points").toString());
+                    int limit = Integer.parseInt(data.get("Limit").toString());
+                    String limitPeriod = data.get("LimitPeriod").toString();
+                    LimitPeriod limitPeriodEnumVal = LimitPeriod.day;
+                    if (limitPeriod.equals("Week")) {
+                        limitPeriodEnumVal = LimitPeriod.week;
+                    }
+                    if (limitPeriod.equals("Month")) {
+                        limitPeriodEnumVal = LimitPeriod.month;
+                    }
+                    activities[i] = (new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal));
+                    i++;
+                }
+                activitiesCallback.onCallbackActivities(activities);
+            }
+        });
+    }
+
     // Activity Functions
 
     // Completed Activity Functions
@@ -515,6 +551,10 @@ public class DB {
 
     public interface TeamCallback {
         void onCallbackTeam(Team team);
+    }
+
+    public interface ActivitiesCallback {
+        void onCallbackActivities(Activity[] activities);
     }
 
     public interface NextIDCallback {

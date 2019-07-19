@@ -12,9 +12,16 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".AddActivityActivity"
+            android:label="@string/title_activity_add_activity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".TeamHomeActivity"
+            android:label="@string/title_activity_team_home" />
+        <activity
             android:name=".AddTeamActivity"
             android:label="@string/title_activity_add_team"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddProfileActivity"
             android:label="@string/title_activity_add_profile"
