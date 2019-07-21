@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/AddActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorSecondary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".AddActivityActivity"
-    tools:showIn="@layout/activity_add_activity">
+    tools:context=".AddCompletedActivityActivity"
+    tools:showIn="@layout/activity_add_completed_activity">
 
     <LinearLayout
         android:id="@+id/activityNameLayout"
@@ -30,27 +30,26 @@
             android:layout_weight="0"
             android:text="@string/activity_name" />
 
-        <EditText
-            android:id="@+id/activityNameTextField"
+        <TextView
+            android:id="@+id/nameTextViewValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:inputType="textPersonName" />
+            android:layout_weight="0" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/activityDescriptionLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="30dp"
-        android:gravity="bottom"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activityNameLayout">
+    android:id="@+id/activityDescriptionLayout"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_marginStart="30dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginEnd="30dp"
+    android:gravity="bottom"
+    android:orientation="horizontal"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/activityNameLayout">
 
         <TextView
             android:id="@+id/descriptionTextView"
@@ -59,12 +58,13 @@
             android:layout_weight="0"
             android:text="@string/activity_description" />
 
-        <EditText
-            android:id="@+id/activityDescriptionTextView"
+        <TextView
+            android:id="@+id/descriptionTextViewValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:inputType="textImeMultiLine" />
+            android:ellipsize="end"
+            android:maxLines="3" />
 
     </LinearLayout>
 
@@ -86,14 +86,13 @@
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:text="@string/points" />
+            android:text="@string/limit" />
 
-        <EditText
-            android:id="@+id/pointsTextField"
+        <TextView
+            android:id="@+id/pointsTextViewValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:inputType="number" />
+            android:layout_weight="0" />
 
     </LinearLayout>
 
@@ -104,10 +103,11 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="30dp"
+        android:gravity="bottom"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activityPointsLayout">
+        app:layout_constraintTop_toBottomOf="@id/activityPointsLayout">
 
         <TextView
             android:id="@+id/limitTextView"
@@ -116,18 +116,16 @@
             android:layout_weight="0"
             android:text="@string/limit" />
 
-        <EditText
-            android:id="@+id/limitTextField"
-            android:layout_width="80dp"
+        <TextView
+            android:id="@+id/limitTextViewValue"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="number" />
+            android:layout_weight="0" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/activitylimitPeriodLayout"
+        android:id="@+id/activityQuantityLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="30dp"
@@ -140,22 +138,23 @@
         app:layout_constraintTop_toBottomOf="@id/activityLimitLayout">
 
         <TextView
-            android:id="@+id/perTextView"
+            android:id="@+id/quantityTextView"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:text="@string/per" />
+            android:text="@string/quantity" />
 
-        <Spinner
-            android:id="@+id/limitSelector"
+        <EditText
+            android:id="@+id/quantityTextField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0" />
+            android:layout_weight="0"
+            android:inputType="number|textPersonName" />
 
     </LinearLayout>
 
     <Button
-        android:id="@+id/addActivityButton"
+        android:id="@+id/completeActivityButton"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="30dp"
@@ -163,12 +162,12 @@
         android:layout_marginEnd="30dp"
         android:background="@color/colorPrimary"
         android:gravity="center_horizontal|center_vertical"
-        android:onClick="addButtonPressed"
-        android:text="@string/add_activity"
+        android:text="@string/complete_activity"
         android:textColor="@color/colorSecondary"
+        android:onClick="completeActivity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activitylimitPeriodLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/activityQuantityLayout" />
 
     <TextView
         android:id="@+id/errorLabel"
@@ -181,6 +180,6 @@
         android:textColor="#F44336"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addActivityButton" />
+        app:layout_constraintTop_toBottomOf="@+id/completeActivityButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

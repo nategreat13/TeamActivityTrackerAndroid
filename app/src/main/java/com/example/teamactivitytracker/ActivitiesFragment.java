@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -25,6 +26,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ActivitiesFragment extends Fragment {
 
     private Team team;
@@ -34,6 +37,7 @@ public class ActivitiesFragment extends Fragment {
     private DB db;
     private FrameLayout layout;
     private FloatingActionButton fab;
+    private int indexActivity;
     ArrayAdapter<String> adapter;
 
     public ActivitiesFragment() {
@@ -106,6 +110,36 @@ public class ActivitiesFragment extends Fragment {
 
         // Assign adapter to ListView
         listView.setAdapter(adapter);
+
+        // ListView Item Click Listener
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                activitySelected(position);
+            }
+
+        });
+    }
+
+    public void activitySelected(int position) {
+        if (profileType == ProfileType.Player) {
+            indexActivity = position;
+            Intent intent = new Intent(getActivity(), AddCompletedActivityActivity.class);
+            intent.putExtra("TID", team.getTid());
+            intent.putExtra("PID", player.getPid());
+            intent.putExtra("ACTIVITY", team.getActivities()[position]);
+            startActivityForResult(intent, 1);
+        }
+        else {
+            indexActivity = position;
+            Intent intent = new Intent(getActivity(), AddActivityActivity.class);
+            intent.putExtra("TID", team.getTid());
+            intent.putExtra("ACTIVITY", team.getActivities()[position]);
+            intent.putExtra("ISEDIT", true);
+            startActivityForResult(intent, 1);
+        }
     }
 
     public void updateListView() {
@@ -154,5 +188,25 @@ public class ActivitiesFragment extends Fragment {
         Intent intent = new Intent(getActivity(), AddActivityActivity.class);
         intent.putExtra("TID", team.getTid());
         startActivityForResult(intent, 1);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                if (profileType == ProfileType.Coach) {
+                    String type = data.getStringExtra("TYPE");
+                    Activity activity = (Activity) data.getSerializableExtra("ACTIVITY");
+                    if (type.equals("Add")) {
+                        team.addActivity(activity);
+                    }
+                    else {
+                        team.editAdtivity(activity, indexActivity);
+                    }
+                    updateListView();
+                }
+            }
+        }
     }
 }

@@ -51,21 +51,29 @@
     <string name="Period">Period</string>
     <string name="Total">Total</string>
     <string name="add_new_activity">Add New Activity</string>
-    <string name="limit">Limit</string>
+    <string name="limit">Limit:</string>
     <string name="per">Per</string>
     <string name="add_activity">Add Actvity</string>
-    <string name="activity_name">Activity Name</string>
-    <string name="activity_description">Activity Description</string>
+    <string name="edit_activity">Edit Actvity</string>
+    <string name="activity_name">Name:</string>
+    <string name="activity_description">Description:</string>
     <string name="title_activity_add_activity">AddActivityActivity</string>
     <string name="activity_name_required">Name Required</string>
     <string name="activity_description_required">Description Required</string>
     <string name="activity_limit_required">Limit Required</string>
     <string name="activity_limit_must_be_number">Limit must be a number</string>
     <string name="activity_limit_cant_be_zero">Limit cant be zero</string>
-
-    <string-array name="limit_arrays">
-        <item>Day</item>
-        <item>Week</item>
-        <item>Month</item>
-    </string-array>
+    <string name="activity_points_required">Points Required</string>
+    <string name="activity_points_must_be_number">Points must be a number</string>
+    <string name="activity_points_cant_be_zero">Points cant be zero</string>
+    <string name="error_adding_activity">Error adding activity</string>
+    <string name="error_updating_activity">Error Updating activity</string>
+    <string name="points">Points:</string>
+    <string name="title_activity_add_completed_activity">AddCompletedActivityActivity</string>
+    <string name="quantity">Quantity:</string>
+    <string name="comment_optional">Comment (Optional)</string>
+    <string name="complete_activity">Complete Activity</string>
+    <string name="activity_quantity_required">Quantity Required</string>
+    <string name="activity_quantity_must_be_number">Quantity must be a number</string>
+    <string name="activity_quantity_cant_be_zero">Quantity cant be zero</string>
 </resources>

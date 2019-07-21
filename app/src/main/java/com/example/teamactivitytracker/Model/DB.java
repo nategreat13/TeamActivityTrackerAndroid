@@ -13,11 +13,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DB {
+
+    public static Team currentTeam;
 
     private FirebaseFirestore db;
 
@@ -482,7 +485,137 @@ public class DB {
 
     // Activity Functions
 
+    public void addActivity(String name, String description, int points, String tid, int limit, LimitPeriod limitPeriod, ActivityCallback activityCallback) {
+        String limitPeriodString = "Day";
+        if (limitPeriod == LimitPeriod.week) {
+            limitPeriodString = "Week";
+        }
+        else if (limitPeriod == LimitPeriod.month) {
+            limitPeriodString = "Month";
+        }
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("Name", name);
+        data.put("Description", description);
+        data.put("Points", points);
+        data.put("tid", tid);
+        data.put("Limit", limit);
+        data.put("LimitPeriod", limitPeriodString);
+
+        getNextId(NextIDType.activity, nextID -> {
+            if (nextID != -1) {
+                String aid = "A-" + nextID;
+                db.collection("Activities").document(aid)
+                        .set(data)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                setNextID(NextIDType.activity, nextID + 1);
+                                activityCallback.onCallbackActivity(new Activity(aid, name, description, points, tid, limit, limitPeriod));
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                activityCallback.onCallbackActivity(null);
+                            }
+                        });
+            }
+        });
+    }
+
+    public void editActivity(Activity activity, ActivityCallback activityCallback) {
+        String limitPeriodString = "Day";
+        if (activity.getLimitPeriod() == LimitPeriod.week) {
+            limitPeriodString = "Week";
+        }
+        else if (activity.getLimitPeriod() == LimitPeriod.month) {
+            limitPeriodString = "Month";
+        }
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("Name", activity.getName());
+        data.put("Description", activity.getDescription());
+        data.put("Points", activity.getPoints());
+        data.put("tid", activity.getTid());
+        data.put("Limit", activity.getLimit());
+        data.put("LimitPeriod", limitPeriodString);
+
+        db.collection("Activities").document(activity.getAid())
+                .update(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        activityCallback.onCallbackActivity(activity);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activityCallback.onCallbackActivity(null);
+                    }
+                });
+    }
+
     // Completed Activity Functions
+
+    public void addCompletedActivity(Activity activity, long date, int quantity, int totalPoints, String comment, String pid, String tid, String playerName, CompletedActivityCallback completedActivityCallback) {
+
+        HashMap<String, Object> activityData = new HashMap<>();
+        activityData.put("aid", activity.getAid());
+        activityData.put("Name", activity.getName());
+        activityData.put("Description", activity.getDescription());
+        activityData.put("Points", activity.getPoints());
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("Activity", activityData);
+        data.put("Date", date);
+        data.put("TotalPoints", totalPoints);
+        data.put("Comment", comment);
+        data.put("tid", tid);
+        data.put("pid", pid);
+        data.put("playerName", playerName);
+
+        getNextId(NextIDType.completedActivity, nextID -> {
+            if (nextID != -1) {
+                String caid = "CA-" + nextID;
+                db.collection("CompletedActivities").document(caid)
+                        .set(data)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                setNextID(NextIDType.completedActivity, nextID + 1);
+                                try {
+                                    int currentPoints = currentTeam.getPlayerPoints().get(pid);
+                                    int newPoints = currentPoints + totalPoints;
+                                    currentTeam.getPlayerPoints().put(pid, newPoints);
+
+                                    int currentPeriodPoints = currentTeam.getPlayerPeriodPoints().get(pid);
+                                    int newPeriodPoints = currentPeriodPoints + totalPoints;
+                                    currentTeam.getPlayerPeriodPoints().put(pid, newPeriodPoints);
+
+                                    HashMap<String, Object> newPointsData = new HashMap<>();
+                                    newPointsData.put("PlayerPoints." + pid, newPoints);
+                                    newPointsData.put("PlayerPeriodPoints." + pid, newPeriodPoints);
+                                    db.collection("Teams").document(tid).update(newPointsData);
+
+                                    completedActivityCallback.onCallbackCompletedActivity(new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, new Date(date)));
+                                }
+                                catch (Exception e) {
+                                    completedActivityCallback.onCallbackCompletedActivity(null);
+                                }
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                completedActivityCallback.onCallbackCompletedActivity(null);
+                            }
+                        });
+            }
+        });
+    }
 
     // NextID Functions
 
@@ -555,6 +688,14 @@ public class DB {
 
     public interface ActivitiesCallback {
         void onCallbackActivities(Activity[] activities);
+    }
+
+    public interface ActivityCallback {
+        void onCallbackActivity(Activity activity);
+    }
+
+    public interface CompletedActivityCallback {
+        void onCallbackCompletedActivity(CompletedActivity completedActivity);
     }
 
     public interface NextIDCallback {

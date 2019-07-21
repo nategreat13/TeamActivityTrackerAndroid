@@ -5,7 +5,7 @@
     android:id="@+id/activitiesLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#888888"
+    android:background="@color/colorSecondary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ActivitiesFragment">
 
@@ -17,7 +17,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:background="#888888" />
+        android:background="@color/colorSecondary" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

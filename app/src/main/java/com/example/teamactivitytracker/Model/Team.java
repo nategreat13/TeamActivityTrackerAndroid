@@ -103,4 +103,17 @@ public class Team implements Serializable {
     public void setActivities(Activity[] activities) {
         this.activities = activities;
     }
+
+    public void addActivity(Activity activity) {
+        Activity[] newActivities = new Activity[activities.length + 1];
+        for (int i = 0; i < activities.length; i++) {
+            newActivities[i] = activities[i];
+        }
+        newActivities[activities.length] = activity;
+        activities = newActivities;
+    }
+
+    public void editAdtivity(Activity activity, int index) {
+        activities[index] = activity;
+    }
 }
