@@ -129,6 +129,7 @@ public class ActivitiesFragment extends Fragment {
             Intent intent = new Intent(getActivity(), AddCompletedActivityActivity.class);
             intent.putExtra("TID", team.getTid());
             intent.putExtra("PID", player.getPid());
+            intent.putExtra("PLAYER_NAME", player.getFirstName() + " " + player.getLastName());
             intent.putExtra("ACTIVITY", team.getActivities()[position]);
             startActivityForResult(intent, 1);
         }

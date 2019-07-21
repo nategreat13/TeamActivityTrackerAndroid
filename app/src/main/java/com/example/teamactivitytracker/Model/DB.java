@@ -1,6 +1,7 @@
 package com.example.teamactivitytracker.Model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.teamactivitytracker.ActivitiesFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -9,7 +10,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -19,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DB {
-
-    public static Team currentTeam;
 
     private FirebaseFirestore db;
 
@@ -430,12 +431,12 @@ public class DB {
                             coaches = new HashMap<>();
                         }
                         @SuppressWarnings("unchecked")
-                        HashMap<String, Integer> playerPoints = (HashMap<String, Integer>) data.get("PlayerPoints");
+                        HashMap<String, Long> playerPoints = (HashMap<String, Long>) data.get("PlayerPoints");
                         if (playerPoints == null) {
                             playerPoints = new HashMap<>();
                         }
                         @SuppressWarnings("unchecked")
-                        HashMap<String, Integer> playerPeriodPoints = (HashMap<String, Integer>) data.get("PlayerPeriodPoints");
+                        HashMap<String, Long> playerPeriodPoints = (HashMap<String, Long>) data.get("PlayerPeriodPoints");
                         if (playerPeriodPoints == null) {
                             playerPeriodPoints = new HashMap<>();
                         }
@@ -586,13 +587,11 @@ public class DB {
                             public void onSuccess(Void aVoid) {
                                 setNextID(NextIDType.completedActivity, nextID + 1);
                                 try {
-                                    int currentPoints = currentTeam.getPlayerPoints().get(pid);
+                                    int currentPoints = Globals.currentTeam.getPlayerPoints().get(pid).intValue();
                                     int newPoints = currentPoints + totalPoints;
-                                    currentTeam.getPlayerPoints().put(pid, newPoints);
 
-                                    int currentPeriodPoints = currentTeam.getPlayerPeriodPoints().get(pid);
+                                    int currentPeriodPoints = Globals.currentTeam.getPlayerPeriodPoints().get(pid).intValue();
                                     int newPeriodPoints = currentPeriodPoints + totalPoints;
-                                    currentTeam.getPlayerPeriodPoints().put(pid, newPeriodPoints);
 
                                     HashMap<String, Object> newPointsData = new HashMap<>();
                                     newPointsData.put("PlayerPoints." + pid, newPoints);
@@ -662,6 +661,47 @@ public class DB {
                 return "Player";
         }
         return "";
+    }
+
+    // Listeners
+    public void listenForTeam(String tid, TeamCallback teamCallback) {
+        final DocumentReference docRef = db.collection("Teams").document(tid);
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    Map<String, Object> data = snapshot.getData();
+                    String teamName = data.get("Name").toString();
+                    @SuppressWarnings("unchecked")
+                    HashMap<String, String> players = (HashMap<String, String>) data.get("Players");
+                    if (players == null) {
+                        players = new HashMap<>();
+                    }
+                    @SuppressWarnings("unchecked")
+                    HashMap<String, String> coaches = (HashMap<String, String>) data.get("Coaches");
+                    if (coaches == null) {
+                        coaches = new HashMap<>();
+                    }
+                    @SuppressWarnings("unchecked")
+                    HashMap<String, Long> playerPoints = (HashMap<String, Long>) data.get("PlayerPoints");
+                    if (playerPoints == null) {
+                        playerPoints = new HashMap<>();
+                    }
+                    @SuppressWarnings("unchecked")
+                    HashMap<String, Long> playerPeriodPoints = (HashMap<String, Long>) data.get("PlayerPeriodPoints");
+                    if (playerPeriodPoints == null) {
+                        playerPeriodPoints = new HashMap<>();
+                    }
+
+                    teamCallback.onCallbackTeam(new Team(tid, teamName, players, coaches, playerPoints, playerPeriodPoints));
+                }
+            }
+        });
     }
 
     // Callbacks

@@ -24,6 +24,7 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
     private DB db;
     private String tid;
     private String pid;
+    private String playerName;
     private Activity activity;
     private TextView errorLabel;
 
@@ -42,6 +43,7 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
         db = new DB();
         tid = getIntent().getStringExtra("TID");
         pid = getIntent().getStringExtra("PID");
+        playerName = getIntent().getStringExtra("PLAYER_NAME");
         activity = (Activity) getIntent().getSerializableExtra("ACTIVITY");
 
         TextView activityNameTextView = findViewById(R.id.nameTextViewValue);
@@ -87,6 +89,17 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
             errorLabel.setText(R.string.activity_quantity_cant_be_zero);
             return;
         }
+        EditText commentTextField = findViewById(R.id.commentTextField);
+        String comment = commentTextField.getText().toString();
+
+        db.addCompletedActivity(activity, System.currentTimeMillis(), quantity, activity.getPoints() * quantity, comment, pid, tid, playerName, completedActivity -> {
+            if (completedActivity != null) {
+                finish();
+            }
+            else {
+                errorLabel.setText(R.string.error_completing_activity);
+            }
+        });
     }
 
     @Override

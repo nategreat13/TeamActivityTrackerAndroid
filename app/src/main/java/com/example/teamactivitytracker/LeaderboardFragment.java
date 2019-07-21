@@ -13,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ToggleButton;
 
 import com.example.teamactivitytracker.Model.Activity;
 import com.example.teamactivitytracker.Model.Team;
@@ -32,6 +34,10 @@ import java.util.Set;
 public class LeaderboardFragment extends Fragment {
 
     private Team team;
+    private boolean totalSelected = true;
+    private ArrayAdapter<String> adapter;
+    private Button periodButton;
+    private Button totalButton;
 
     public LeaderboardFragment() {
     }
@@ -50,28 +56,8 @@ public class LeaderboardFragment extends Fragment {
 
         ListView listView = getActivity().findViewById(R.id.list);
 
-        HashMap<String, Integer> playerPoints = team.getPlayerPoints();
-        PointsPair[] pointPairs = new PointsPair[playerPoints.size()];
-        int i = 0;
-        for (String pid : playerPoints.keySet().toArray(new String[playerPoints.size()])) {
-            int points = playerPoints.get(pid);
-            pointPairs[i] = new PointsPair(pid, points);
-            i++;
-        }
-        Arrays.sort(pointPairs, new Comparator<PointsPair>() {
-            public int compare(PointsPair pp1, PointsPair pp2) {
-                return Integer.compare(pp1.points, pp2.points);
-            }
-        });
-
-        ArrayList<String> values = new ArrayList<>();
-
-        for (i = 0; i < pointPairs.length; i++) {
-            values.add(i + ". " + team.getPlayers().get(pointPairs[i].pid) + " -- " + pointPairs[i].points);
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, values) {
+        adapter = new ArrayAdapter<String>
+                (getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, getValuesForListView()) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent){
                 // Get the current item from ListView
@@ -90,6 +76,9 @@ public class LeaderboardFragment extends Fragment {
 
         // Assign adapter to ListView
         listView.setAdapter(adapter);
+
+        periodButton = getActivity().findViewById(R.id.periodButton);
+        totalButton = getActivity().findViewById(R.id.totalButton);
     }
 
     @Override
@@ -99,6 +88,63 @@ public class LeaderboardFragment extends Fragment {
         if (getArguments() != null) {
             team = (Team) getArguments().getSerializable("TEAM");
         }
+    }
+
+    public ArrayList<String> getValuesForListView() {
+        HashMap<String, Long> pointsMap = new HashMap<>();
+        if (totalSelected) {
+            pointsMap = team.getPlayerPoints();
+        }
+        else {
+            pointsMap = team.getPlayerPeriodPoints();
+        }
+        PointsPair[] pointPairs = new PointsPair[pointsMap.size()];
+        int i = 0;
+        for (String pid : pointsMap.keySet().toArray(new String[pointsMap.size()])) {
+            int points = pointsMap.get(pid).intValue();
+            pointPairs[i] = new PointsPair(pid, points);
+            i++;
+        }
+        Arrays.sort(pointPairs, new Comparator<PointsPair>() {
+            public int compare(PointsPair pp1, PointsPair pp2) {
+                return Integer.compare(pp2.points, pp1.points);
+            }
+        });
+
+        ArrayList<String> values = new ArrayList<>();
+
+        for (i = 0; i < pointPairs.length; i++) {
+            values.add((i+1) + ". " + team.getPlayers().get(pointPairs[i].pid) + " -- " + pointPairs[i].points);
+        }
+        return values;
+    }
+
+    public void periodButtonPressed() {
+        if (totalSelected) {
+            totalSelected = false;
+            updateListView();
+            periodButton.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+            periodButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+            totalButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            totalButton.setTextColor(getResources().getColor(R.color.colorSecondary));
+        }
+    }
+
+    public void totalButtonPressed() {
+        if (!totalSelected) {
+            totalSelected = true;
+            updateListView();
+            totalButton.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+            totalButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+            periodButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            periodButton.setTextColor(getResources().getColor(R.color.colorSecondary));
+        }
+    }
+
+    public void updateListView() {
+        adapter.clear();
+        adapter.addAll(getValuesForListView());
+        adapter.notifyDataSetChanged();
     }
 
     @Override

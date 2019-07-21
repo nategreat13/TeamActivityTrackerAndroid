@@ -5,10 +5,12 @@ import android.os.Bundle;
 import com.example.teamactivitytracker.Model.Activity;
 import com.example.teamactivitytracker.Model.Coach;
 import com.example.teamactivitytracker.Model.DB;
+import com.example.teamactivitytracker.Model.Globals;
 import com.example.teamactivitytracker.Model.Player;
 import com.example.teamactivitytracker.Model.ProfileType;
 import com.example.teamactivitytracker.Model.Team;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.DocumentReference;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
@@ -24,10 +26,11 @@ public class TeamHomeActivity extends AppCompatActivity {
     private TextView mTextMessage;
 
     private DB db;
-    private Team team;
     private ProfileType profileType;
+    private Team team;
     private Player player;
     private Coach coach;
+    private Fragment fragment;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -57,9 +60,10 @@ public class TeamHomeActivity extends AppCompatActivity {
 
     private void loadFragment(Fragment fragment) {
         // load fragment
+        this.fragment = fragment;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_container, fragment);
-        transaction.addToBackStack(null);
+        //transaction.addToBackStack(null);
         transaction.commit();
     }
 
@@ -88,7 +92,27 @@ public class TeamHomeActivity extends AppCompatActivity {
             coach = (Coach) getIntent().getSerializableExtra("COACH");
         }
         String tid = getIntent().getStringExtra("TEAM_ID");
-        db.getTeam(tid, team -> setTeam(team));
+        listenForTeamUpdates(tid);
+    }
+
+    public void periodButtonPressed(View view) {
+        try {
+            LeaderboardFragment leaderboardFragment = (LeaderboardFragment) fragment;
+            leaderboardFragment.periodButtonPressed();
+        }
+        catch (Exception e) {
+            return;
+        }
+    }
+
+    public void totalButtonPressed(View view) {
+        try {
+            LeaderboardFragment leaderboardFragment = (LeaderboardFragment) fragment;
+            leaderboardFragment.totalButtonPressed();
+        }
+        catch (Exception e) {
+            return;
+        }
     }
 
     @Override
@@ -97,12 +121,17 @@ public class TeamHomeActivity extends AppCompatActivity {
         return true;
     }
 
+    public void listenForTeamUpdates(String tid) {
+        db.listenForTeam(tid, updatedTeam -> setTeam(updatedTeam));
+    }
+
     public Team getTeam() {
         return team;
     }
 
     public void setTeam(Team team) {
         this.team = team;
+        Globals.currentTeam = team;
         getSupportActionBar().setTitle(team.getName());
     }
 }

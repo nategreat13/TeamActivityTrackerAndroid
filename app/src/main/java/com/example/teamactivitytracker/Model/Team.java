@@ -10,8 +10,8 @@ public class Team implements Serializable {
     private String name;
     private HashMap<String, String> players;
     private HashMap<String, String> coaches;
-    private HashMap<String, Integer> playerPoints;
-    private HashMap<String, Integer> playerPeriodPoints;
+    private HashMap<String, Long> playerPoints;
+    private HashMap<String, Long> playerPeriodPoints;
     private Activity[] activities;
 
     // New team
@@ -21,13 +21,13 @@ public class Team implements Serializable {
         this.players = new HashMap<>();
         this.coaches = new HashMap<>();
         coaches.put(cid, coachName);
-        this.playerPoints = new HashMap<String, Integer>();
-        this.playerPeriodPoints = new HashMap<String, Integer>();
+        this.playerPoints = new HashMap<>();
+        this.playerPeriodPoints = new HashMap<>();
         this.activities = new Activity[0];
     }
 
     // Load team without activities
-    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Integer> playerPoints, HashMap<String, Integer> playerPeriodPoints) {
+    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Long> playerPoints, HashMap<String, Long> playerPeriodPoints) {
         this.tid = tid;
         this.name = name;
         this.players = players;
@@ -38,7 +38,7 @@ public class Team implements Serializable {
     }
 
     // Load team with activities
-    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Integer> playerPoints, HashMap<String, Integer> playerPeriodPoints, Activity[] activities) {
+    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Long> playerPoints, HashMap<String, Long> playerPeriodPoints, Activity[] activities) {
         this.tid = tid;
         this.name = name;
         this.players = players;
@@ -80,19 +80,19 @@ public class Team implements Serializable {
         this.coaches = coaches;
     }
 
-    public HashMap<String, Integer> getPlayerPoints() {
+    public HashMap<String, Long> getPlayerPoints() {
         return playerPoints;
     }
 
-    public void setPlayerPoints(HashMap<String, Integer> playerPoints) {
+    public void setPlayerPoints(HashMap<String, Long> playerPoints) {
         this.playerPoints = playerPoints;
     }
 
-    public HashMap<String, Integer> getPlayerPeriodPoints() {
+    public HashMap<String, Long> getPlayerPeriodPoints() {
         return playerPeriodPoints;
     }
 
-    public void setPlayerPeriodPoints(HashMap<String, Integer> playerPeriodPoints) {
+    public void setPlayerPeriodPoints(HashMap<String, Long> playerPeriodPoints) {
         this.playerPeriodPoints = playerPeriodPoints;
     }
 

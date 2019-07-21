@@ -153,21 +153,35 @@
 
     </LinearLayout>
 
+    <EditText
+        android:id="@+id/commentTextField"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:hint="@string/comment_optional"
+        android:inputType="textPersonName"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activityQuantityLayout" />
+
     <Button
         android:id="@+id/completeActivityButton"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="30dp"
         android:background="@color/colorPrimary"
         android:gravity="center_horizontal|center_vertical"
+        android:onClick="completeActivity"
         android:text="@string/complete_activity"
         android:textColor="@color/colorSecondary"
-        android:onClick="completeActivity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activityQuantityLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/commentTextField" />
 
     <TextView
         android:id="@+id/errorLabel"

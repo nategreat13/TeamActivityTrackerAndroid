@@ -76,4 +76,5 @@
     <string name="activity_quantity_required">Quantity Required</string>
     <string name="activity_quantity_must_be_number">Quantity must be a number</string>
     <string name="activity_quantity_cant_be_zero">Quantity cant be zero</string>
+    <string name="error_completing_activity">Error completing activity</string>
 </resources>
