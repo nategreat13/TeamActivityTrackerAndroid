@@ -77,4 +77,13 @@
     <string name="activity_quantity_must_be_number">Quantity must be a number</string>
     <string name="activity_quantity_cant_be_zero">Quantity cant be zero</string>
     <string name="error_completing_activity">Error completing activity</string>
+    <string name="monthly_leaders">Monthly Leaders</string>
+    <string name="overall_leaders">Overall Leaders</string>
+    <string name="month">Month</string>
+    <string name="overall">Overall</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="period_limit_reached">Period Limit Reached</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

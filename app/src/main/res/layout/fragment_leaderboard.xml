@@ -23,20 +23,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorSecondary"
             android:onClick="periodButtonPressed"
-            android:text="@string/Period"
-            android:textColor="@color/colorSecondary" />
+            android:text="@string/month"
+            android:textColor="@color/colorPrimary" />
 
         <Button
             android:id="@+id/totalButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/colorSecondary"
+            android:background="@color/colorPrimary"
             android:onClick="totalButtonPressed"
-            android:text="@string/Total"
-            android:textColor="@color/colorPrimary" />
+            android:text="@string/overall"
+            android:textColor="@color/colorSecondary" />
     </LinearLayout>
 
 

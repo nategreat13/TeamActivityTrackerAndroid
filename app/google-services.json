@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:639532194642:android:1ce672d3603ed4cd",
         "android_client_info": {
-          "package_name": "com.example.teamactivitytracker"
+          "package_name": "com.nategreat13.teamactivitytracker"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "639532194642-ntp8mjq7s34i4tnl60bkabpg43htqsrn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.teamactivitytracker",
+            "package_name": "com.nategreat13.teamactivitytracker",
             "certificate_hash": "669a6f77e974339ffe68368d5b10ac223e961f0b"
           }
         },

@@ -86,7 +86,7 @@
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:text="@string/limit" />
+            android:text="@string/points" />
 
         <TextView
             android:id="@+id/pointsTextViewValue"
