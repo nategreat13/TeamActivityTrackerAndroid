@@ -1,5 +1,7 @@
 package com.nategreat13.teamactivitytracker;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.nategreat13.teamactivitytracker.Model.Coach;
@@ -11,12 +13,15 @@ import com.nategreat13.teamactivitytracker.Model.ProfileType;
 import com.nategreat13.teamactivitytracker.Model.Team;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -38,6 +43,7 @@ public class TeamHomeActivity extends AppCompatActivity {
     private boolean firstLoad = true;
     private boolean isOnHomeFragment = true;
     private boolean isOnLeaderboardFragment = false;
+    private BottomNavigationView navView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -87,7 +93,7 @@ public class TeamHomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_home);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+        navView = findViewById(R.id.nav_view);
         mTextMessage = findViewById(R.id.message);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -110,7 +116,6 @@ public class TeamHomeActivity extends AppCompatActivity {
         String tid = getIntent().getStringExtra("TEAM_ID");
         listenForTeamUpdates(tid);
         listenForCompletedActivities(tid);
-        listenForTeamActivityUpdates(tid);
     }
 
     public void periodButtonPressed(View view) {
@@ -141,6 +146,7 @@ public class TeamHomeActivity extends AppCompatActivity {
 
     public void listenForTeamUpdates(String tid) {
         db.listenForTeam(tid, updatedTeam -> setTeam(updatedTeam));
+        listenForTeamActivityUpdates(tid);
     }
 
     public void listenForTeamActivityUpdates(String tid) {
@@ -161,6 +167,9 @@ public class TeamHomeActivity extends AppCompatActivity {
     public void setTeam(Team team) {
         this.team = team;
         Globals.currentTeam = team;
+        if (!team.getShowLeaderboard()) {
+            navView.getMenu().removeItem(R.id.navigation_leaderboard);
+        }
         getSupportActionBar().setTitle(team.getName());
         if (firstLoad) {
             fragment = TeamHomeFragment.newInstance(team);
@@ -204,4 +213,27 @@ public class TeamHomeActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        menu.removeItem(R.id.action_logout);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, TeamSettingsActivity.class);
+                intent.putExtra("TEAM", team);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
 }

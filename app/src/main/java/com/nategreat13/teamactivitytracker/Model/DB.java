@@ -312,21 +312,21 @@ public class DB {
     }
 
     // Team Functions
-
-    public void addTeam(String tid, String teamName, String cid, String coachName, TeamCallback teamCallback) {
+    public void addTeam(String tid, String teamName, String cid, String coachName, Boolean showFullLeaderboard, TeamCallback teamCallback) {
         HashMap<String, Object> coachInfo = new HashMap<>();
         coachInfo.put(cid, coachName);
 
         HashMap<String, Object> data = new HashMap<>();
         data.put("Name", teamName);
         data.put("Coaches", coachInfo);
+        data.put("ShowLeaderboard", showFullLeaderboard);
 
         db.collection("Teams").document(tid)
                 .set(data)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        teamCallback.onCallbackTeam(new Team(tid, teamName, cid, coachName));
+                        teamCallback.onCallbackTeam(new Team(tid, teamName, cid, coachName, showFullLeaderboard));
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -338,11 +338,8 @@ public class DB {
     }
 
     public void addTeamToCoach(String tid, String teamName, String cid, BooleanCallback booleanCallback) {
-        HashMap<String, Object> teamInfo = new HashMap<>();
-        teamInfo.put(tid, teamName);
-
         HashMap<String, Object> data = new HashMap<>();
-        data.put("Teams", teamInfo);
+        data.put("Teams." + tid, teamName);
 
         db.collection("Coaches").document(cid)
                 .update(data)
@@ -361,11 +358,8 @@ public class DB {
     }
 
     public void addTeamToPlayer(String tid, String teamName, String pid, BooleanCallback booleanCallback) {
-        HashMap<String, Object> teamInfo = new HashMap<>();
-        teamInfo.put(tid, teamName);
-
         HashMap<String, Object> data = new HashMap<>();
-        data.put("Teams", teamInfo);
+        data.put("Teams." + tid, teamName);
 
         db.collection("Players").document(pid)
                 .update(data)
@@ -440,8 +434,12 @@ public class DB {
                         if (playerPeriodPoints == null) {
                             playerPeriodPoints = new HashMap<>();
                         }
+                        Boolean showLeaderboard = (Boolean) data.get("ShowLeaderboard");
+                        if (showLeaderboard == null) {
+                            showLeaderboard = true;
+                        }
 
-                        teamCallback.onCallbackTeam(new Team(tid, teamName, players, coaches, playerPoints, playerPeriodPoints));
+                        teamCallback.onCallbackTeam(new Team(tid, teamName, players, coaches, playerPoints, playerPeriodPoints, showLeaderboard));
                     } else {
                         teamCallback.onCallbackTeam(null);
                     }
@@ -482,6 +480,25 @@ public class DB {
                 activitiesCallback.onCallbackActivities(activities);
             }
         });
+    }
+
+    public void updateTeamShowLeaderboard(String tid, Boolean showLeaderbooard, BooleanCallback booleanCallback) {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("ShowLeaderboard", showLeaderbooard);
+
+        db.collection("Teams").document(tid).update(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        booleanCallback.onCallbackBoolean(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        booleanCallback.onCallbackBoolean(false);
+                    }
+                });
     }
 
     // Activity Functions
@@ -752,8 +769,12 @@ public class DB {
                     if (playerPeriodPoints == null) {
                         playerPeriodPoints = new HashMap<>();
                     }
+                    Boolean showLeaderboard = (Boolean) data.get("ShowLeaderboard");
+                    if (showLeaderboard == null) {
+                        showLeaderboard = true;
+                    }
 
-                    teamCallback.onCallbackTeam(new Team(tid, teamName, players, coaches, playerPoints, playerPeriodPoints));
+                    teamCallback.onCallbackTeam(new Team(tid, teamName, players, coaches, playerPoints, playerPeriodPoints, showLeaderboard));
                 }
             }
         });

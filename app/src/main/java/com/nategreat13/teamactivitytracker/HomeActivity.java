@@ -54,25 +54,6 @@ public class HomeActivity extends AppCompatActivity {
 
         db = new DB();
 
-        //////////
-        /*
-        db.getTeamActivities("BK09Blue", activities -> {
-            for (int i = 0; i < activities.length; i++) {
-                Activity activity = activities[i];
-                db.addActivity(activity.getName(), activity.getDescription(), activity.getPoints(), "BK09White", activity.getLimit(), activity.getLimitPeriod(), activity1 -> {
-                    System.out.println("Done");
-                });
-                try {
-                    Thread.sleep(15000);
-                }
-                catch(InterruptedException ie) {
-                    System.out.println("Error");
-                }
-            }
-        });
-        */
-        //////////
-
         // Get User
         String currentUserEmail = getIntent().getStringExtra("CURRENT_USER_EMAIL");
         if (currentUserEmail != null) {

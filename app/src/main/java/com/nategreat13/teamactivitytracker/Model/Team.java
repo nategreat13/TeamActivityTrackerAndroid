@@ -13,9 +13,10 @@ public class Team implements Serializable {
     private HashMap<String, Long> playerPoints;
     private HashMap<String, Long> playerPeriodPoints;
     private Activity[] activities;
+    private Boolean showLeaderboard;
 
     // New team
-    public Team(String tid, String name, String cid, String coachName) {
+    public Team(String tid, String name, String cid, String coachName, Boolean showLeaderboard) {
         this.tid = tid;
         this.name = name;
         this.players = new HashMap<>();
@@ -24,10 +25,11 @@ public class Team implements Serializable {
         this.playerPoints = new HashMap<>();
         this.playerPeriodPoints = new HashMap<>();
         this.activities = new Activity[0];
+        this.showLeaderboard = showLeaderboard;
     }
 
     // Load team without activities
-    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Long> playerPoints, HashMap<String, Long> playerPeriodPoints) {
+    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Long> playerPoints, HashMap<String, Long> playerPeriodPoints, Boolean showLeaderboard) {
         this.tid = tid;
         this.name = name;
         this.players = players;
@@ -35,10 +37,11 @@ public class Team implements Serializable {
         this.playerPoints = playerPoints;
         this.playerPeriodPoints = playerPeriodPoints;
         this.activities = new Activity[0];
+        this.showLeaderboard = showLeaderboard;
     }
 
     // Load team with activities
-    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Long> playerPoints, HashMap<String, Long> playerPeriodPoints, Activity[] activities) {
+    public Team(String tid, String name, HashMap<String, String> players, HashMap<String, String> coaches, HashMap<String, Long> playerPoints, HashMap<String, Long> playerPeriodPoints, Activity[] activities, Boolean showLeaderboard) {
         this.tid = tid;
         this.name = name;
         this.players = players;
@@ -46,6 +49,7 @@ public class Team implements Serializable {
         this.playerPoints = playerPoints;
         this.playerPeriodPoints = playerPeriodPoints;
         this.activities = activities;
+        this.showLeaderboard = showLeaderboard;
     }
 
     public String getTid() {
@@ -115,5 +119,13 @@ public class Team implements Serializable {
 
     public void editAdtivity(Activity activity, int index) {
         activities[index] = activity;
+    }
+
+    public Boolean getShowLeaderboard() {
+        return showLeaderboard;
+    }
+
+    public void setShowLeaderboard(Boolean showLeaderboard) {
+        this.showLeaderboard = showLeaderboard;
     }
 }

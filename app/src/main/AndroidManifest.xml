@@ -12,34 +12,38 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="com.nategreat13.teamactivitytracker.AddCompletedActivityActivity"
-            android:label="@string/title_activity_add_completed_activity"
+            android:name=".TeamSettingsActivity"
+            android:label="@string/title_activity_team_settings"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
-            android:name="com.nategreat13.teamactivitytracker.AddActivityActivity"
+            android:name=".AddCompletedActivityActivity"
+            android:label="@string/title_activity_add_completed_activity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AddActivityActivity"
             android:label="@string/title_activity_add_activity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.nategreat13.teamactivitytracker.TeamHomeActivity"
+            android:name=".TeamHomeActivity"
             android:label="@string/title_activity_team_home" />
         <activity
-            android:name="com.nategreat13.teamactivitytracker.AddTeamActivity"
+            android:name=".AddTeamActivity"
             android:label="@string/title_activity_add_team"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.nategreat13.teamactivitytracker.AddProfileActivity"
+            android:name=".AddProfileActivity"
             android:label="@string/title_activity_add_profile"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.nategreat13.teamactivitytracker.ProfileActivity"
+            android:name=".ProfileActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.nategreat13.teamactivitytracker.HomeActivity"
+            android:name=".HomeActivity"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name="com.nategreat13.teamactivitytracker.RegisterActivity" />
-        <activity android:name="com.nategreat13.teamactivitytracker.MainActivity">
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -75,7 +75,7 @@
 
         <EditText
             android:id="@+id/teamNameTextField"
-            android:layout_width="347dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/team_name"
@@ -83,11 +83,21 @@
 
         <EditText
             android:id="@+id/teamIDTextField"
-            android:layout_width="347dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/team_id"
             android:inputType="text" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <CheckBox
+            android:id="@+id/showFullLeaderboardCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show_full_leaderboard" />
 
         <Space
             android:layout_width="match_parent"

@@ -94,11 +94,7 @@ public class LeaderboardFragment extends Fragment {
             pointPairs[i] = new PointsPair(pid, points);
             i++;
         }
-        Arrays.sort(pointPairs, new Comparator<PointsPair>() {
-            public int compare(PointsPair pp1, PointsPair pp2) {
-                return Integer.compare(pp2.points, pp1.points);
-            }
-        });
+        Arrays.sort(pointPairs, (pp1, pp2) -> Integer.compare(pp2.points, pp1.points));
 
         ArrayList<String> values = new ArrayList<>();
 

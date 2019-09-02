@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -34,6 +35,7 @@ public class AddTeamActivity extends AppCompatActivity {
     private Player player;
     private Coach coach;
     private ProfileType profileType;
+    private CheckBox showFullLeaderboardCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class AddTeamActivity extends AppCompatActivity {
         existingTeamRadioButton = findViewById(R.id.coachRadioButton);
         errorLabel = findViewById(R.id.errorLabel);
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
+        showFullLeaderboardCheckBox = findViewById((R.id.showFullLeaderboardCheckBox));
 
         String type = getIntent().getStringExtra("PROFILE_TYPE");
         profileType = (type.equals("Player")) ? ProfileType.Player : ProfileType.Coach;
@@ -59,6 +62,7 @@ public class AddTeamActivity extends AppCompatActivity {
             player = (Player) getIntent().getSerializableExtra("PLAYER");
             radioGroup.setVisibility(View.INVISIBLE);
             teamNameTextField.setVisibility(View.INVISIBLE);
+            showFullLeaderboardCheckBox.setVisibility(View.INVISIBLE);
             addButton.setText(R.string.join_existing_team);
         }
         else {
@@ -71,11 +75,13 @@ public class AddTeamActivity extends AppCompatActivity {
     public void newTeamRadioButtonSelected(View view) {
         addButton.setText(getString(R.string.create_new_team));
         teamNameTextField.setVisibility(View.VISIBLE);
+        showFullLeaderboardCheckBox.setVisibility(View.VISIBLE);
     }
 
     public void existingTeamRadioButtonSelected(View view) {
         addButton.setText(getString(R.string.join_existing_team));
         teamNameTextField.setVisibility(View.INVISIBLE);
+        showFullLeaderboardCheckBox.setVisibility(View.INVISIBLE);
     }
 
     public void addButtonPressed(View view) {
@@ -95,7 +101,7 @@ public class AddTeamActivity extends AppCompatActivity {
         }
         else {
             if (newTeamRadioButton.isChecked()) {
-                createTeam(tid, teamName);
+                createTeam(tid, teamName, showFullLeaderboardCheckBox.isChecked());
             }
             else {
                 joinTeamWithCoach(tid);
@@ -169,8 +175,8 @@ public class AddTeamActivity extends AppCompatActivity {
         });
     }
 
-    public void createTeam(String tid, String teamName) {
-        db.addTeam(tid, teamName, coach.getCid(), coach.getFirstName() + " " + coach.getLastName(), team -> {
+    public void createTeam(String tid, String teamName, Boolean showFullLeaderboard) {
+        db.addTeam(tid, teamName, coach.getCid(), coach.getFirstName() + " " + coach.getLastName(), showFullLeaderboard, team -> {
             if (team == null) {
                 errorLabel.setText(R.string.error_creating_team);
             }

@@ -148,7 +148,7 @@ public class TeamHomeFragment extends Fragment {
                 ViewGroup.LayoutParams params = view.getLayoutParams();
 
                 // Set the height of the Item View
-                params.height = 100;
+                params.height = 200;
                 view.setLayoutParams(params);
 
                 return view;
@@ -182,7 +182,8 @@ public class TeamHomeFragment extends Fragment {
 
         ArrayList<String> values = new ArrayList<>();
 
-        for (i = 0; i < pointPairs.length; i++) {
+        int stop = team.getPlayers().size() > 3 ? 3 : team.getPlayers().size();
+        for (i = 0; i < stop; i++) {
             values.add((i+1) + ". " + team.getPlayers().get(pointPairs[i].pid) + " -- " + pointPairs[i].points);
         }
 
