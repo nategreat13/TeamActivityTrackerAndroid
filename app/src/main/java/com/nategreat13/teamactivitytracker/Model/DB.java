@@ -616,7 +616,7 @@ public class DB {
                                     newPointsData.put("PlayerPeriodPoints." + pid, newPeriodPoints);
                                     db.collection("Teams").document(tid).update(newPointsData);
 
-                                    completedActivityCallback.onCallbackCompletedActivity(new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, new Date(date)));
+                                    completedActivityCallback.onCallbackCompletedActivity(new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, new Date(date*1000)));
                                 }
                                 catch (Exception e) {
                                     completedActivityCallback.onCallbackCompletedActivity(null);
@@ -656,7 +656,42 @@ public class DB {
                                 int totalPoints = Integer.parseInt(completedActivityData.get("TotalPoints").toString());
                                 String playerName = completedActivityData.get("PlayerName").toString();
                                 Long dateLong = Long.parseLong(completedActivityData.get("Date").toString());
-                                Date date = new Date(dateLong);
+                                Date date = new Date(dateLong*1000);
+                                Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day);
+                                CompletedActivity completedActivity = new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, date);
+                                completedActivities.add(completedActivity);
+                            }
+                            completedActivitiesCallback.onCallbackCompletedActivities(completedActivities);
+                        } else {
+                            completedActivitiesCallback.onCallbackCompletedActivities(null);
+                        }
+                    }
+                });
+    }
+
+    public void getCompletedActivitiesForPlayerSinceTime(String tid, String pid, long time, CompletedActivitiesCallback completedActivitiesCallback) {
+        db.collection("CompletedActivities").whereEqualTo("tid", tid).whereEqualTo("pid", pid).whereGreaterThan("Date", time).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            ArrayList<CompletedActivity> completedActivities = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String caid = document.getId();
+                                Map<String, Object> completedActivityData = document.getData();
+                                @SuppressWarnings("unchecked")
+                                Map<String, Object> activityData = (Map<String, Object>) completedActivityData.get("Activity");
+                                String aid = activityData.get("aid").toString();
+                                String name = activityData.get("Name").toString();
+                                String description = activityData.get("Description").toString();
+                                int points = Integer.parseInt(activityData.get("Points").toString());
+                                String pid = completedActivityData.get("pid").toString();
+                                String tid = completedActivityData.get("tid").toString();
+                                int quantity = Integer.parseInt(completedActivityData.get("Quantity").toString());
+                                int totalPoints = Integer.parseInt(completedActivityData.get("TotalPoints").toString());
+                                String playerName = completedActivityData.get("PlayerName").toString();
+                                Long dateLong = Long.parseLong(completedActivityData.get("Date").toString());
+                                Date date = new Date(dateLong*1000);
                                 Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day);
                                 CompletedActivity completedActivity = new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, date);
                                 completedActivities.add(completedActivity);
@@ -839,7 +874,7 @@ public class DB {
                             int totalPoints = Integer.parseInt(completedActivityData.get("TotalPoints").toString());
                             String playerName = completedActivityData.get("PlayerName").toString();
                             Long dateLong = Long.parseLong(completedActivityData.get("Date").toString());
-                            Date date = new Date(dateLong);
+                            Date date = new Date(dateLong*1000);
                             Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day);
                             CompletedActivity completedActivity = new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, date);
                             completedActivities.add(completedActivity);

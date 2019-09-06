@@ -12,9 +12,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".PlayerDetailActivity"
+            android:label="@string/title_activity_player_detail"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".TeamSettingsActivity"
             android:label="@string/title_activity_team_settings"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddCompletedActivityActivity"
             android:label="@string/title_activity_add_completed_activity"

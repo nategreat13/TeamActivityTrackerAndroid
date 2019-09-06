@@ -1,5 +1,7 @@
 package com.nategreat13.teamactivitytracker.Model;
 
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,8 +17,6 @@ public class Team implements Serializable {
     private String tid;
     private String name;
     private HashMap<String, String> players;
-    private List<Map.Entry<String, String>> playersSorted;
-    private List<Map.Entry<String, String>> coachesSorted;
     private HashMap<String, String> coaches;
     private HashMap<String, Long> playerPoints;
     private HashMap<String, Long> playerPeriodPoints;
@@ -28,10 +28,8 @@ public class Team implements Serializable {
         this.tid = tid;
         this.name = name;
         this.players = new HashMap<>();
-        this.playersSorted = new LinkedList<>();
         this.coaches = new HashMap<>();
         this.coaches.put(cid, coachName);
-        this.coachesSorted = sort(coaches);
         this.playerPoints = new HashMap<>();
         this.playerPeriodPoints = new HashMap<>();
         this.activities = new Activity[0];
@@ -43,9 +41,7 @@ public class Team implements Serializable {
         this.tid = tid;
         this.name = name;
         this.players = players;
-        this.playersSorted = sort(players);
         this.coaches = coaches;
-        this.coachesSorted = sort(coaches);
         this.playerPoints = playerPoints;
         this.playerPeriodPoints = playerPeriodPoints;
         this.activities = new Activity[0];
@@ -57,30 +53,12 @@ public class Team implements Serializable {
         this.tid = tid;
         this.name = name;
         this.players = players;
-        this.playersSorted = sort(players);
         this.coaches = coaches;
-        this.coachesSorted = sort(coaches);
         this.playerPoints = playerPoints;
         this.playerPeriodPoints = playerPeriodPoints;
         this.activities = activities;
         this.showLeaderboard = showLeaderboard;
     }
-
-    public List<Map.Entry<String, String>> sort(HashMap<String, String> values) {
-        LinkedList<Map.Entry<String, String>> list = new LinkedList<Map.Entry<String, String>>(values.entrySet());
-        Collections.sort(list, comp);
-        return list;
-    }
-
-    public Comparator<Map.Entry<String, String>> comp =
-            new Comparator<Map.Entry<String, String>>()
-            {
-                @Override
-                public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2 )
-                {
-                    return ( o1.getValue() ).compareTo( o2.getValue() );
-                }
-            };
 
     public String getTid() {
         return tid;
@@ -158,23 +136,5 @@ public class Team implements Serializable {
     public void setShowLeaderboard(Boolean showLeaderboard) {
         this.showLeaderboard = showLeaderboard;
     }
-
-    public List<Map.Entry<String, String>> getPlayersSorted() {
-        return playersSorted;
-    }
-
-    public void setPlayersSorted(List<Map.Entry<String, String>> playersSorted) {
-        this.playersSorted = playersSorted;
-    }
-
-    public List<Map.Entry<String, String>> getCoachesSorted() {
-        return coachesSorted;
-    }
-
-    public void setCoachesSorted(List<Map.Entry<String, String>> coachesSorted) {
-        this.coachesSorted = coachesSorted;
-    }
-
-
 
 }
