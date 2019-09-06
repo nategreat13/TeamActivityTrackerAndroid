@@ -17,6 +17,8 @@ import com.nategreat13.teamactivitytracker.Model.Team;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RosterFragment extends Fragment {
 
@@ -40,20 +42,16 @@ public class RosterFragment extends Fragment {
 
         ListView listView = getActivity().findViewById(R.id.list);
 
-        HashMap<String, String> players = team.getPlayers();
-        String[] playerIDs = players.keySet().toArray(new String[players.size()]);
-        Arrays.sort(playerIDs);
-        HashMap<String, String> coaches = team.getCoaches();
-        String[] coachIDs = coaches.keySet().toArray(new String[coaches.size()]);
-        Arrays.sort(coachIDs);
-
         ArrayList<String> values = new ArrayList<>();
 
-        for (int j = 0; j < coachIDs.length; j++) {
-            values.add(coaches.get(coachIDs[j]) + " (Coach)");
+        List<Map.Entry<String, String>> coaches = team.getCoachesSorted();
+        for (int i = 0; i< coaches.size(); i++) {
+            values.add(coaches.get(i).getValue());
         }
-        for (int i = 0; i < playerIDs.length; i++) {
-            values.add(players.get(playerIDs[i]) + " (Player)");
+
+        List<Map.Entry<String, String>> players = team.getPlayersSorted();
+        for (int i = 0; i< players.size(); i++) {
+            values.add(players.get(i).getValue());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
