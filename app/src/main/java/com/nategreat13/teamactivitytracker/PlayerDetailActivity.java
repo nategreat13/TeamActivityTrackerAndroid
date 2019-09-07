@@ -126,7 +126,7 @@ public class PlayerDetailActivity extends AppCompatActivity {
                     ViewGroup.LayoutParams params = view.getLayoutParams();
 
                     // Set the height of the Item View
-                    params.height = 120;
+                    params.height = 150;
                     view.setLayoutParams(params);
 
                     return view;

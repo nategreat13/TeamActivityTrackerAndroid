@@ -91,7 +91,7 @@ public class TeamHomeFragment extends Fragment {
                 ViewGroup.LayoutParams params = view.getLayoutParams();
 
                 // Set the height of the Item View
-                params.height = 100;
+                params.height = periodLeadersList.getHeight()/3;
                 view.setLayoutParams(params);
 
                 return view;
@@ -114,7 +114,7 @@ public class TeamHomeFragment extends Fragment {
                 ViewGroup.LayoutParams params = view.getLayoutParams();
 
                 // Set the height of the Item View
-                params.height = 100;
+                params.height = totalLeadersList.getHeight()/3;
                 view.setLayoutParams(params);
 
                 return view;
