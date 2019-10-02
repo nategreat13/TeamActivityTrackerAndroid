@@ -28,6 +28,8 @@
     <string name="team_id">Team ID</string>
     <string name="player">Player</string>
     <string name="coach">Coach</string>
+    <string name="playerProfiles">Player profiles</string>
+    <string name="coachProfiles">Coach profiles</string>
     <string name="error_adding_player">Error Adding Player</string>
     <string name="error_adding_coach">Error Adding Coach</string>
     <string name="team_id_doesnt_exist">Team ID doesn\'t exist</string>

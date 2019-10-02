@@ -20,7 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +34,13 @@ public class HomeActivity extends AppCompatActivity {
     private DB db;
     private User user = new User();
 
-    private ListView listView;
-    ArrayAdapter<String> adapter;
+    private ListView listPlayers;
+    private ListView listCoaches;
+    ArrayAdapter<String> adapterPlayers;
+    ArrayAdapter<String> adapterCoaches;
+
+    private TextView playersTextView;
+    private TextView coachesTextView;
 
     HashMap<String, String> players;
     String[] playerIDs;
@@ -48,7 +55,10 @@ public class HomeActivity extends AppCompatActivity {
         toolbar.setTitle("Home");
         setSupportActionBar(toolbar);
 
-        listView = findViewById(R.id.list);
+        listPlayers = findViewById(R.id.listPlayers);
+        listCoaches = findViewById(R.id.listCoaches);
+        playersTextView = findViewById(R.id.textViewPlayers);
+        coachesTextView = findViewById(R.id.textViewCoaches);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -60,10 +70,10 @@ public class HomeActivity extends AppCompatActivity {
             db.getUser(currentUserEmail.replace(".", ""), loadedUser -> setUser(loadedUser));
         }
 
-        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> playerValues = new ArrayList<>();
 
-        adapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, android.R.id.text1, values) {
+        adapterPlayers = new ArrayAdapter<String>
+                (this, android.R.layout.simple_list_item_1, android.R.id.text1, playerValues) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent){
                 // Get the current item from ListView
@@ -81,19 +91,52 @@ public class HomeActivity extends AppCompatActivity {
         };
 
         // Assign adapter to ListView
-        listView.setAdapter(adapter);
+        listPlayers.setAdapter(adapterPlayers);
 
         // ListView Item Click Listener
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listPlayers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                profileSelected(position);
+                playerSelected(position);
             }
 
         });
 
+        ArrayList<String> coachValues = new ArrayList<>();
+
+        adapterCoaches = new ArrayAdapter<String>
+                (this, android.R.layout.simple_list_item_1, android.R.id.text1, coachValues) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent){
+                // Get the current item from ListView
+                View view = super.getView(position,convertView,parent);
+
+                // Get the Layout Parameters for ListView Current Item View
+                ViewGroup.LayoutParams params = view.getLayoutParams();
+
+                // Set the height of the Item View
+                params.height = 250;
+                view.setLayoutParams(params);
+
+                return view;
+            }
+        };
+
+        // Assign adapter to ListView
+        listCoaches.setAdapter(adapterCoaches);
+
+        // ListView Item Click Listener
+        listCoaches.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                coachSelected(position);
+            }
+
+        });
     }
 
     public User getUser() {
@@ -104,7 +147,7 @@ public class HomeActivity extends AppCompatActivity {
         this.user = user;
         if (user != null) {
             updateToolbarTitle();
-            updateListView();
+            updateListViews();
         }
     }
 
@@ -118,7 +161,7 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(user.getFirstName() + " " + user.getLastName());
     }
 
-    public void updateListView() {
+    public void updateListViews() {
 
         players = user.getPlayers();
         playerIDs = players.keySet().toArray(new String[players.size()]);
@@ -127,37 +170,44 @@ public class HomeActivity extends AppCompatActivity {
         coachIDs = coaches.keySet().toArray(new String[coaches.size()]);
         Arrays.sort(coachIDs);
 
-        adapter.clear();
+        adapterPlayers.clear();
+        adapterCoaches.clear();
 
-        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> playerValues = new ArrayList<>();
+        ArrayList<String> coachValues = new ArrayList<>();
 
         for (int i = 0; i < playerIDs.length; i++) {
-            values.add(players.get(playerIDs[i]) + " (Player)");
+            playerValues.add(players.get(playerIDs[i]) + " (Player)");
         }
         for (int j = 0; j < coachIDs.length; j++) {
-            values.add(coaches.get(coachIDs[j]) + " (Coach)");
+            coachValues.add(coaches.get(coachIDs[j]) + " (Coach)");
         }
-        adapter.addAll(values);
-        adapter.notifyDataSetChanged();
+        adapterPlayers.addAll(playerValues);
+        adapterPlayers.notifyDataSetChanged();
+
+        adapterCoaches.addAll(coachValues);
+        adapterCoaches.notifyDataSetChanged();
+
+        setListViewHeightBasedOnChildren(listPlayers);
+        setListViewHeightBasedOnChildren(listCoaches);
     }
 
-    public void profileSelected(int index) {
-        if (index < playerIDs.length) {
-            String pid = playerIDs[index];
-            // Go to profile page for pid
-            Intent intent = new Intent(this, ProfileActivity.class);
-            intent.putExtra("PROFILE_TYPE", "Player");
-            intent.putExtra("PID", pid);
-            startActivity(intent);
-        }
-        else if (index < (playerIDs.length + coachIDs.length)) {
-            String cid = coachIDs[index - playerIDs.length];
-            // Go to profile page for cid
-            Intent intent = new Intent(this, ProfileActivity.class);
-            intent.putExtra("PROFILE_TYPE", "Coach");
-            intent.putExtra("CID", cid);
-            startActivity(intent);
-        }
+    public void playerSelected(int index) {
+        String pid = playerIDs[index];
+        // Go to profile page for pid
+        Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra("PROFILE_TYPE", "Player");
+        intent.putExtra("PID", pid);
+        startActivity(intent);
+    }
+
+    public void coachSelected(int index) {
+        String cid = coachIDs[index];
+        // Go to profile page for cid
+        Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra("PROFILE_TYPE", "Coach");
+        intent.putExtra("CID", cid);
+        startActivity(intent);
     }
 
     @Override
@@ -167,7 +217,7 @@ public class HomeActivity extends AppCompatActivity {
                 User updatedUser = (User) data.getSerializableExtra("USER");
                 if (updatedUser != null) {
                     setUser(updatedUser);
-                    updateListView();
+                    updateListViews();
                 }
             }
         }
@@ -209,4 +259,18 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = listAdapter.getCount() * 250;
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
 }

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.nategreat13.teamactivitytracker.Model.Team;
 
@@ -30,6 +31,11 @@ public class RosterFragment extends Fragment {
     private Team team;
     private List<Map.Entry<String, String>> playersSorted;
     private List<Map.Entry<String, String>> coachesSorted;
+    private ListView listPlayers;
+    private ListView listCoaches;
+
+    private TextView playersTextView;
+    private TextView coachesTextView;
 
     public RosterFragment() {
     }
@@ -47,38 +53,24 @@ public class RosterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ListView listView = getActivity().findViewById(R.id.list);
+        listPlayers = getActivity().findViewById(R.id.listPlayers);
+        listCoaches = getActivity().findViewById(R.id.listCoaches);
 
-        ArrayList<String> values = new ArrayList<>();
-
-        /*
-        HashMap<String, String> players = team.getPlayers();
-        String[] playerIDs = players.keySet().toArray(new String[players.size()]);
-        Arrays.sort(playerIDs);
-        HashMap<String, String> coaches = team.getCoaches();
-        String[] coachIDs = coaches.keySet().toArray(new String[coaches.size()]);
-        Arrays.sort(coachIDs);
-
-        for (int j = 0; j < coachIDs.length; j++) {
-            values.add(coaches.get(coachIDs[j]) + " (Coach)");
-        }
-        for (int i = 0; i < playerIDs.length; i++) {
-            values.add(players.get(playerIDs[i]) + " (Player)");
-        }
-        */
+        ArrayList<String> playerValues = new ArrayList<>();
+        ArrayList<String> coachValues = new ArrayList<>();
 
         coachesSorted = sort(team.getCoaches());
         for (int i = 0; i< coachesSorted.size(); i++) {
-            values.add(coachesSorted.get(i).getValue());
+            coachValues.add(coachesSorted.get(i).getValue());
         }
 
         playersSorted = sort(team.getPlayers());
         for (int i = 0; i< playersSorted.size(); i++) {
-            values.add(playersSorted.get(i).getValue());
+            playerValues.add(playersSorted.get(i).getValue());
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, values) {
+        ArrayAdapter<String> playerAdapter = new ArrayAdapter<String>
+                (getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, playerValues) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent){
                 // Get the current item from ListView
@@ -96,10 +88,10 @@ public class RosterFragment extends Fragment {
         };
 
         // Assign adapter to ListView
-        listView.setAdapter(adapter);
+        listPlayers.setAdapter(playerAdapter);
 
         // ListView Item Click Listener
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listPlayers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -108,6 +100,27 @@ public class RosterFragment extends Fragment {
             }
 
         });
+
+        ArrayAdapter<String> coachAdapter = new ArrayAdapter<String>
+                (getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, coachValues) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent){
+                // Get the current item from ListView
+                View view = super.getView(position,convertView,parent);
+
+                // Get the Layout Parameters for ListView Current Item View
+                ViewGroup.LayoutParams params = view.getLayoutParams();
+
+                // Set the height of the Item View
+                params.height = 125;
+                view.setLayoutParams(params);
+
+                return view;
+            }
+        };
+
+        // Assign adapter to ListView
+        listCoaches.setAdapter(coachAdapter);
     }
 
     @Override
@@ -127,24 +140,12 @@ public class RosterFragment extends Fragment {
     }
 
     public void playerSelected(int index) {
-        /*
-        HashMap<String, String> players = team.getPlayers();
-        String[] playerIDs = players.keySet().toArray(new String[players.size()]);
-        Arrays.sort(playerIDs);
-        String pid = playerIDs[index - team.getCoaches().size()];
+        String pid = playersSorted.get(index).getKey();
         Intent intent = new Intent(getActivity(), PlayerDetailActivity.class);
         intent.putExtra("TID", team.getTid());
         intent.putExtra("PID", pid);
+        intent.putExtra("PLAYER_NAME", playersSorted.get(index).getValue());
         startActivity(intent);
-        */
-
-        if (index >= coachesSorted.size()) {
-            String pid = playersSorted.get(index - coachesSorted.size()).getKey();
-            Intent intent = new Intent(getActivity(), PlayerDetailActivity.class);
-            intent.putExtra("TID", team.getTid());
-            intent.putExtra("PID", pid);
-            startActivity(intent);
-        }
     }
     public List<Map.Entry<String, String>> sort(HashMap<String, String> values) {
         LinkedList<Map.Entry<String, String>> list = new LinkedList<Map.Entry<String, String>>(values.entrySet());

@@ -1,6 +1,10 @@
 package com.nategreat13.teamactivitytracker;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import com.nategreat13.teamactivitytracker.Model.Coach;
@@ -8,6 +12,7 @@ import com.nategreat13.teamactivitytracker.Model.DB;
 import com.nategreat13.teamactivitytracker.Model.Player;
 import com.nategreat13.teamactivitytracker.Model.ProfileType;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -20,6 +25,11 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private ProfileType profileType = ProfileType.None;
@@ -30,8 +40,9 @@ public class ProfileActivity extends AppCompatActivity {
     private Player player;
     private String[] teamIDs;
     private HashMap<String, String> teams;
+    private Activity activity;
 
-    private ListView listView;
+    private SwipeMenuListView listView;
     ArrayAdapter<String> adapter;
 
     @Override
@@ -43,6 +54,8 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        activity = this;
 
         listView = findViewById(R.id.list);
         db = new DB();
@@ -89,6 +102,73 @@ public class ProfileActivity extends AppCompatActivity {
                 teamSelected(position);
             }
 
+        });
+
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+                        getApplicationContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
+                // set item width
+                deleteItem.setWidth(300);
+                // set item title
+                deleteItem.setTitle("Delete");
+                // set item title fontsize
+                deleteItem.setTitleSize(18);
+                // set item title font color
+                deleteItem.setTitleColor(Color.WHITE);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+
+        // set creator
+        listView.setMenuCreator(creator);
+
+
+        // Left
+        listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                       if (profileType == ProfileType.Player) {
+                           String tid = teamIDs[position];
+                           new AlertDialog.Builder(activity)
+                                   .setIcon(android.R.drawable.ic_dialog_alert)
+                                   .setTitle("Remove player from team?")
+                                   .setMessage("Are you sure you want to remove " + player.getFirstName() + " " + player.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
+                                   .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                                   {
+                                       @Override
+                                       public void onClick(DialogInterface dialog, int which) {
+                                           db.removePlayerFromTeam(pid, tid, success -> {
+                                               if (success) {
+                                                   HashMap<String, String> newTeams = player.getTeams();
+                                                   newTeams.remove(tid);
+                                                   updateListView();
+                                               }
+                                               else {
+                                                   System.out.println("Fail");
+                                               }
+                                           });
+                                       }
+                                   })
+                                   .setNegativeButton("No", null)
+                                   .show();
+                       }
+                       break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
         });
     }
 

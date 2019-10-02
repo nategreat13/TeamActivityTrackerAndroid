@@ -36,6 +36,7 @@ public class PlayerDetailActivity extends AppCompatActivity {
     private DB db;
     private String tid;
     private String pid;
+    private String playerName;
     private Spinner filterSpinner;
     private Button filterButton;
     private ListView completedActivitiesListView;
@@ -53,6 +54,9 @@ public class PlayerDetailActivity extends AppCompatActivity {
         db = new DB();
         tid = getIntent().getStringExtra("TID");
         pid = getIntent().getStringExtra("PID");
+        playerName = getIntent().getStringExtra("PLAYER_NAME");
+
+        getSupportActionBar().setTitle(playerName);
 
         filterButton = findViewById(R.id.filterButton);
         filterSpinner = findViewById(R.id.filterSpinner);

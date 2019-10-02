@@ -4,12 +4,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.menu.MenuAdapter;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.nategreat13.teamactivitytracker.Model.CompletedActivity;
@@ -76,6 +78,8 @@ public class TeamHomeFragment extends Fragment {
         updatePeriodLeadersListView();
         updateTotalLeadersListView();
         updateRecentActivitiesListView();
+        setListViewHeightBasedOnChildren(periodLeadersList);
+        setListViewHeightBasedOnChildren(totalLeadersList);
     }
 
 
@@ -91,7 +95,7 @@ public class TeamHomeFragment extends Fragment {
                 ViewGroup.LayoutParams params = view.getLayoutParams();
 
                 // Set the height of the Item View
-                params.height = periodLeadersList.getHeight()/3;
+                params.height = 100;
                 view.setLayoutParams(params);
 
                 return view;
@@ -114,7 +118,7 @@ public class TeamHomeFragment extends Fragment {
                 ViewGroup.LayoutParams params = view.getLayoutParams();
 
                 // Set the height of the Item View
-                params.height = totalLeadersList.getHeight()/3;
+                params.height = 100;
                 view.setLayoutParams(params);
 
                 return view;
@@ -197,8 +201,7 @@ public class TeamHomeFragment extends Fragment {
 
     public void setTeam(Team team) {
         this.team = team;
-        updatePeriodLeadersListView();
-        updateTotalLeadersListView();
+        updateListViews();
     }
 
     private class PointsPair {
@@ -213,5 +216,20 @@ public class TeamHomeFragment extends Fragment {
 
         public String pid()   { return pid; }
         public int points() { return points; }
+    }
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = listAdapter.getCount() * 100;
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 }

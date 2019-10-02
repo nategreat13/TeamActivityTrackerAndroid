@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -202,6 +203,42 @@ public class DB {
                 }
             }
         });
+    }
+
+    public void removePlayerFromTeam(String pid, String tid, BooleanCallback booleanCallback) {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("Players." + pid, FieldValue.delete());
+        data.put("PlayerPoints." + pid, FieldValue.delete());
+        data.put("PlayerPeriodPoints." + pid, FieldValue.delete());
+        db.collection("Teams").document(tid).update(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        HashMap<String, Object> data = new HashMap<>();
+                        data.put("Teams." + tid, FieldValue.delete());
+                        db.collection("Players").document(pid).update(data);
+                        db.collection("CompletedActivities").whereEqualTo("tid", tid).whereEqualTo("pid", pid).get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            ArrayList<CompletedActivity> completedActivities = new ArrayList<>();
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                String caid = document.getId();
+                                                db.collection("CompletedActivities").document(caid).delete();
+                                            }
+                                        }
+                                    }
+                                });
+                        booleanCallback.onCallbackBoolean(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        booleanCallback.onCallbackBoolean(false);
+                    }
+                });
     }
 
     // Coach Functions
