@@ -17,10 +17,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class DB {
 
@@ -348,6 +350,27 @@ public class DB {
                 });
     }
 
+    public void removeCoachFromTeam(String cid, String tid, BooleanCallback booleanCallback) {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("Coaches." + cid, FieldValue.delete());
+        db.collection("Teams").document(tid).update(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        HashMap<String, Object> data = new HashMap<>();
+                        data.put("Teams." + tid, FieldValue.delete());
+                        db.collection("Coaches").document(cid).update(data);
+                        booleanCallback.onCallbackBoolean(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        booleanCallback.onCallbackBoolean(false);
+                    }
+                });
+    }
+
     // Team Functions
     public void addTeam(String tid, String teamName, String cid, String coachName, Boolean showFullLeaderboard, TeamCallback teamCallback) {
         HashMap<String, Object> coachInfo = new HashMap<>();
@@ -414,6 +437,39 @@ public class DB {
                 });
     }
 
+    public void deleteTeam(Team team, BooleanCallback booleanCallback) {
+        db.collection("Teams").document(team.getTid()).delete()
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    HashMap<String, Object> data = new HashMap<>();
+                    data.put("Teams." + team.getTid(), FieldValue.delete());
+                    Set<String> playerIDs = null;
+                    playerIDs = team.getPlayers().keySet();
+                    for (String pid: playerIDs) {
+                        db.collection("Players").document(pid).update(data);
+                    }
+                    Set<String> coachIDs = null;
+                    coachIDs = team.getCoaches().keySet();
+                    for (String cid: coachIDs) {
+                        db.collection("Coaches").document(cid).update(data);
+                    }
+                    Activity[] activities = team.getActivities();
+                    for (int i = 0; i < activities.length; i++) {
+                        db.collection("Activities").document(activities[i].getAid()).delete();
+                    }
+                    deleteTeamCompletedActivities(team.getTid(), success -> {});
+                    booleanCallback.onCallbackBoolean(true);
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    booleanCallback.onCallbackBoolean(false);
+                }
+            });
+    }
+
     public void findTeam(String tid, StringCallback stringCallback) {
         DocumentReference docRef = db.collection("Teams").document(tid);
 
@@ -422,7 +478,6 @@ public class DB {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-
                     if (document.exists()) {
                         Map<String, Object> data = document.getData();
                         String teamName = data.get("Name").toString();
@@ -434,6 +489,31 @@ public class DB {
 
                 } else {
                     stringCallback.onCallbackString(null);
+                }
+            }
+        });
+    }
+
+    public void getNumberOfCoachesOnTeam(String tid, IntCallback intCallback) {
+        db.collection("Teams").document(tid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Map<String, Object> data = document.getData();
+                        @SuppressWarnings("unchecked")
+                        HashMap<String, String> coaches = (HashMap<String, String>) data.get("Coaches");
+                        if (coaches == null) {
+                            coaches = new HashMap<>();
+                        }
+                        intCallback.onCallbackInt(coaches.size());
+                    } else {
+                        intCallback.onCallbackInt(-1);
+                    }
+
+                } else {
+                    intCallback.onCallbackInt(-1);
                 }
             }
         });
@@ -669,6 +749,24 @@ public class DB {
                         });
             }
         });
+    }
+
+    public void deleteTeamCompletedActivities(String tid, BooleanCallback booleanCallback) {
+        db.collection("CompletedActivities").whereEqualTo("tid", tid).get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String caid = document.getId();
+                            db.collection("CompletedActivities").document(caid).delete();
+                        }
+
+                    } else {
+                        booleanCallback.onCallbackBoolean(false);
+                    }
+                }
+            });
     }
 
     public void getRecentCompletedActivities(String tid, CompletedActivitiesCallback completedActivitiesCallback) {

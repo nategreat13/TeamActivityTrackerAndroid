@@ -1,10 +1,14 @@
 package com.nategreat13.teamactivitytracker;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -15,6 +19,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.nategreat13.teamactivitytracker.Model.DB;
+import com.nategreat13.teamactivitytracker.Model.Player;
+import com.nategreat13.teamactivitytracker.Model.ProfileType;
 import com.nategreat13.teamactivitytracker.Model.Team;
 
 import java.util.ArrayList;
@@ -31,11 +42,14 @@ public class RosterFragment extends Fragment {
     private Team team;
     private List<Map.Entry<String, String>> playersSorted;
     private List<Map.Entry<String, String>> coachesSorted;
-    private ListView listPlayers;
+    private SwipeMenuListView listPlayers;
     private ListView listCoaches;
 
     private TextView playersTextView;
     private TextView coachesTextView;
+
+    private DB db;
+    private ArrayAdapter<String> playerAdapter;
 
     public RosterFragment() {
     }
@@ -56,6 +70,8 @@ public class RosterFragment extends Fragment {
         listPlayers = getActivity().findViewById(R.id.listPlayers);
         listCoaches = getActivity().findViewById(R.id.listCoaches);
 
+        db = new DB();
+
         ArrayList<String> playerValues = new ArrayList<>();
         ArrayList<String> coachValues = new ArrayList<>();
 
@@ -69,7 +85,7 @@ public class RosterFragment extends Fragment {
             playerValues.add(playersSorted.get(i).getValue());
         }
 
-        ArrayAdapter<String> playerAdapter = new ArrayAdapter<String>
+        playerAdapter = new ArrayAdapter<String>
                 (getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, playerValues) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent){
@@ -99,6 +115,72 @@ public class RosterFragment extends Fragment {
                 playerSelected(position);
             }
 
+        });
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+                        getActivity());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
+                // set item width
+                deleteItem.setWidth(300);
+                // set item title
+                deleteItem.setTitle("Delete");
+                // set item title fontsize
+                deleteItem.setTitleSize(18);
+                // set item title font color
+                deleteItem.setTitleColor(Color.WHITE);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+
+        // set creator
+        listPlayers.setMenuCreator(creator);
+
+
+        // Left
+        listPlayers.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        listPlayers.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        String tid = team.getTid();
+                        String teamName = team.getName();
+                        String pid = playersSorted.get(index).getKey();
+                        String playerName = playersSorted.get(index).getValue();
+                        new AlertDialog.Builder(getActivity())
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("Remove player from team?")
+                                .setMessage("Are you sure you want to remove " + playerName + " from " + teamName + "? THIS CANNOT BE UNDONE")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        db.removePlayerFromTeam(pid, tid, success -> {
+                                            if (success) {
+                                                playersSorted.remove(position);
+                                                updatePlayerListView();
+                                            }
+                                            else {
+                                                System.out.println("Fail");
+                                            }
+                                        });
+                                    }
+                                })
+                                .setNegativeButton("No", null)
+                                .show();
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
         });
 
         ArrayAdapter<String> coachAdapter = new ArrayAdapter<String>
@@ -147,6 +229,21 @@ public class RosterFragment extends Fragment {
         intent.putExtra("PLAYER_NAME", playersSorted.get(index).getValue());
         startActivity(intent);
     }
+
+    public void updatePlayerListView() {
+
+        playerAdapter.clear();
+
+        ArrayList<String> playerValues = new ArrayList<>();
+
+        for (int i = 0; i< playersSorted.size(); i++) {
+            playerValues.add(playersSorted.get(i).getValue());
+        }
+
+        playerAdapter.addAll(playerValues);
+        playerAdapter.notifyDataSetChanged();
+    }
+
     public List<Map.Entry<String, String>> sort(HashMap<String, String> values) {
         LinkedList<Map.Entry<String, String>> list = new LinkedList<Map.Entry<String, String>>(values.entrySet());
         Collections.sort(list, comp);

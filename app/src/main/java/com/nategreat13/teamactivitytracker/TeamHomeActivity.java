@@ -1,5 +1,6 @@
 package com.nategreat13.teamactivitytracker;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -228,11 +229,28 @@ public class TeamHomeActivity extends AppCompatActivity {
             case R.id.action_settings:
                 Intent intent = new Intent(this, TeamSettingsActivity.class);
                 intent.putExtra("TEAM", team);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
 
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                boolean deletedTeam = data.getBooleanExtra("DELETED_TEAM", false);
+                if (deletedTeam) {
+                    String deletedTID = data.getStringExtra("DELETED_TID");
+                    Intent intent = new Intent();
+                    intent.putExtra("DELETED_TEAM", true);
+                    intent.putExtra("DELETED_TID", deletedTID);
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
+                }
+            }
         }
     }
 

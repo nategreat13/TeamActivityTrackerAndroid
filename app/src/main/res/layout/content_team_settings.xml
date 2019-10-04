@@ -7,6 +7,7 @@
     android:background="@color/colorSecondary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".TeamSettingsActivity"
+    tools:layout_editor_absoluteY="56dp"
     tools:showIn="@layout/activity_team_settings">
 
     <Space
@@ -27,5 +28,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/space" />
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:width="120sp"
+        android:height="30sp"
+        android:background="@android:color/holo_red_dark"
+        android:onClick="deleteTeam"
+        android:text="@string/delete_team"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

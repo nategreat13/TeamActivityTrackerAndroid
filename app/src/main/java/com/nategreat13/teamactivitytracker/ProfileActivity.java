@@ -164,6 +164,40 @@ public class ProfileActivity extends AppCompatActivity {
                                    .setNegativeButton("No", null)
                                    .show();
                        }
+                       else if (profileType == ProfileType.Coach) {
+                           String tid = teamIDs[position];
+                           new AlertDialog.Builder(activity)
+                                   .setIcon(android.R.drawable.ic_dialog_alert)
+                                   .setTitle("Remove coach from team?")
+                                   .setMessage("Are you sure you want to remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
+                                   .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                                   {
+                                       @Override
+                                       public void onClick(DialogInterface dialog, int which) {
+                                           db.getNumberOfCoachesOnTeam(tid, numberOfCoaches -> {
+                                               if (numberOfCoaches > 1) {
+                                                   db.removeCoachFromTeam(cid, tid, success -> {
+                                                       if (success) {
+                                                           HashMap<String, String> newTeams = coach.getTeams();
+                                                           newTeams.remove(tid);
+                                                           updateListView();
+                                                       }
+                                                   });
+                                               }
+                                               else {
+                                                   new AlertDialog.Builder(activity)
+                                                           .setIcon(android.R.drawable.ic_dialog_alert)
+                                                           .setTitle("Cannot remove coach")
+                                                           .setMessage("Cannot remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + " because they are the only coach on the team")
+                                                           .setNegativeButton("Ok", null)
+                                                           .show();
+                                               }
+                                           });
+                                       }
+                                   })
+                                   .setNegativeButton("No", null)
+                                   .show();
+                       }
                        break;
                 }
                 // false : close the menu; true : not close the menu
@@ -225,7 +259,7 @@ public class ProfileActivity extends AppCompatActivity {
                 intent.putExtra("COACH", getCoach());
             }
             intent.putExtra("TEAM_ID", tid);
-            startActivity(intent);
+            startActivityForResult(intent, 1);
         }
     }
 
@@ -246,7 +280,13 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                if (profileType == ProfileType.Player) {
+                boolean deletedTeam = data.getBooleanExtra("DELETED_TEAM", false);
+                if (deletedTeam) {
+                    String deletedTID = data.getStringExtra("DELETED_TID");
+                    teams.remove(deletedTID);
+                    updateListView();
+                }
+                else if (profileType == ProfileType.Player) {
                     Player updatedPlayer = (Player) data.getSerializableExtra("PLAYER");
                     if (updatedPlayer != null) {
                         setPlayer(updatedPlayer);
