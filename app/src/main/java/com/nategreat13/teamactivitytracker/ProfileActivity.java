@@ -95,13 +95,11 @@ public class ProfileActivity extends AppCompatActivity {
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 teamSelected(position);
             }
-
         });
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -167,36 +165,36 @@ public class ProfileActivity extends AppCompatActivity {
                        else if (profileType == ProfileType.Coach) {
                            String tid = teamIDs[position];
                            new AlertDialog.Builder(activity)
-                                   .setIcon(android.R.drawable.ic_dialog_alert)
-                                   .setTitle("Remove coach from team?")
-                                   .setMessage("Are you sure you want to remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
-                                   .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                                   {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           db.getNumberOfCoachesOnTeam(tid, numberOfCoaches -> {
-                                               if (numberOfCoaches > 1) {
-                                                   db.removeCoachFromTeam(cid, tid, success -> {
-                                                       if (success) {
-                                                           HashMap<String, String> newTeams = coach.getTeams();
-                                                           newTeams.remove(tid);
-                                                           updateListView();
-                                                       }
-                                                   });
-                                               }
-                                               else {
-                                                   new AlertDialog.Builder(activity)
-                                                           .setIcon(android.R.drawable.ic_dialog_alert)
-                                                           .setTitle("Cannot remove coach")
-                                                           .setMessage("Cannot remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + " because they are the only coach on the team")
-                                                           .setNegativeButton("Ok", null)
-                                                           .show();
-                                               }
-                                           });
-                                       }
-                                   })
-                                   .setNegativeButton("No", null)
-                                   .show();
+                               .setIcon(android.R.drawable.ic_dialog_alert)
+                               .setTitle("Remove coach from team?")
+                               .setMessage("Are you sure you want to remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
+                               .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                               {
+                                   @Override
+                                   public void onClick(DialogInterface dialog, int which) {
+                                       db.getNumberOfCoachesOnTeam(tid, numberOfCoaches -> {
+                                           if (numberOfCoaches > 1) {
+                                               db.removeCoachFromTeam(cid, tid, success -> {
+                                                   if (success) {
+                                                       HashMap<String, String> newTeams = coach.getTeams();
+                                                       newTeams.remove(tid);
+                                                       updateListView();
+                                                   }
+                                               });
+                                           }
+                                           else {
+                                               new AlertDialog.Builder(activity)
+                                                       .setIcon(android.R.drawable.ic_dialog_alert)
+                                                       .setTitle("Cannot remove coach")
+                                                       .setMessage("Cannot remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + " because they are the only coach on the team")
+                                                       .setNegativeButton("Ok", null)
+                                                       .show();
+                                           }
+                                       });
+                                   }
+                               })
+                               .setNegativeButton("No", null)
+                               .show();
                        }
                        break;
                 }

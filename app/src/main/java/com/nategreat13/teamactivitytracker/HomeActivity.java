@@ -1,11 +1,18 @@
 package com.nategreat13.teamactivitytracker;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
-import com.nategreat13.teamactivitytracker.Model.Activity;
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.nategreat13.teamactivitytracker.Model.DB;
+import com.nategreat13.teamactivitytracker.Model.ProfileType;
 import com.nategreat13.teamactivitytracker.Model.User;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -34,8 +41,8 @@ public class HomeActivity extends AppCompatActivity {
     private DB db;
     private User user = new User();
 
-    private ListView listPlayers;
-    private ListView listCoaches;
+    private SwipeMenuListView listPlayers;
+    private SwipeMenuListView listCoaches;
     ArrayAdapter<String> adapterPlayers;
     ArrayAdapter<String> adapterCoaches;
 
@@ -46,6 +53,8 @@ public class HomeActivity extends AppCompatActivity {
     String[] playerIDs;
     HashMap<String, String> coaches;
     String[] coachIDs;
+
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +68,8 @@ public class HomeActivity extends AppCompatActivity {
         listCoaches = findViewById(R.id.listCoaches);
         playersTextView = findViewById(R.id.textViewPlayers);
         coachesTextView = findViewById(R.id.textViewCoaches);
+
+        activity = this;
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -102,6 +113,106 @@ public class HomeActivity extends AppCompatActivity {
                 playerSelected(position);
             }
 
+        });
+
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+                        getApplicationContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
+                // set item width
+                deleteItem.setWidth(300);
+                // set item title
+                deleteItem.setTitle("Delete");
+                // set item title fontsize
+                deleteItem.setTitleSize(18);
+                // set item title font color
+                deleteItem.setTitleColor(Color.WHITE);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+
+        // set creator
+        listPlayers.setMenuCreator(creator);
+
+        // Left
+        listPlayers.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        listPlayers.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        String pid = playerIDs[position];
+                        String playerName = players.get(pid);
+                        new AlertDialog.Builder(activity)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Delete Player?")
+                            .setMessage("Are you sure you want to delete " + playerName + "? THIS CANNOT BE UNDONE")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    db.getNumberOfTeamsForPlayer(pid, numberOfTeams -> {
+                                        if (numberOfTeams <= 0) {
+                                            db.deletePlayer(pid, user.getUid(), success -> {
+                                                if (success) {
+                                                    db.getUser(user.getUid(), updatedUser -> {
+                                                        setUser(updatedUser);
+                                                    });
+                                                }
+                                                else {
+                                                    new AlertDialog.Builder(activity)
+                                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                                        .setTitle("Error")
+                                                        .setMessage("Error deleting player")
+                                                        .setNegativeButton("Ok", null)
+                                                        .show();
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            new AlertDialog.Builder(activity)
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .setTitle("Cannot delete player")
+                                                    .setMessage("Cannot delete player because they are a part of at least one team. Please remove them from all teams and try again.")
+                                                    .setNegativeButton("Ok", null)
+                                                    .show();
+                                        }
+                                    });
+                                }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
+        });
+
+        // set creator
+        listCoaches.setMenuCreator(creator);
+
+        // Left
+        listCoaches.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        listCoaches.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
         });
 
         ArrayList<String> coachValues = new ArrayList<>();
@@ -266,11 +377,25 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+
+        /*
         int totalHeight = listAdapter.getCount() * 250;
 
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
+        */
     }
 }

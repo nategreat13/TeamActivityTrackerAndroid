@@ -175,6 +175,51 @@ public class DB {
                 });
     }
 
+    public void deletePlayer(String pid, String uid, BooleanCallback booleanCallback) {
+        db.collection("Players").document(pid).delete();
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("Players." + pid, FieldValue.delete());
+        db.collection("Users").document(uid).update(data)
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    booleanCallback.onCallbackBoolean(true);
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    booleanCallback.onCallbackBoolean(false);
+                }
+            });
+    }
+
+    public void getNumberOfTeamsForPlayer(String pid, IntCallback intCallback) {
+        db.collection("Players").document(pid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+
+                    if (document.exists()) {
+                        Map<String, Object> data = document.getData();
+                        @SuppressWarnings("unchecked")
+                        HashMap<String, String> teams = (HashMap<String, String>) data.get("Teams");
+                        if (teams == null) {
+                            teams = new HashMap<>();
+                        }
+                        intCallback.onCallbackInt(teams.size());
+                    } else {
+                        intCallback.onCallbackInt(-1);
+                    }
+
+                } else {
+                    intCallback.onCallbackInt(-1);
+                }
+            }
+        });
+    }
+
     public void getPlayer(String pid, PlayerCallback playerCallback) {
         DocumentReference docRef = db.collection("Players").document(pid);
 
@@ -348,6 +393,51 @@ public class DB {
                         booleanCallback.onCallbackBoolean(false);
                     }
                 });
+    }
+
+    public void deleteCoach(String cid, String uid, BooleanCallback booleanCallback) {
+        db.collection("Coaches").document(cid).delete();
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("Coaches." + cid, FieldValue.delete());
+        db.collection("Users").document(uid).update(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        booleanCallback.onCallbackBoolean(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        booleanCallback.onCallbackBoolean(false);
+                    }
+                });
+    }
+
+    public void getNumberOfTeamsForCoach(String cid, IntCallback intCallback) {
+        db.collection("Coaches").document(cid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+
+                    if (document.exists()) {
+                        Map<String, Object> data = document.getData();
+                        @SuppressWarnings("unchecked")
+                        HashMap<String, String> teams = (HashMap<String, String>) data.get("Teams");
+                        if (teams == null) {
+                            teams = new HashMap<>();
+                        }
+                        intCallback.onCallbackInt(teams.size());
+                    } else {
+                        intCallback.onCallbackInt(-1);
+                    }
+
+                } else {
+                    intCallback.onCallbackInt(-1);
+                }
+            }
+        });
     }
 
     public void removeCoachFromTeam(String cid, String tid, BooleanCallback booleanCallback) {
