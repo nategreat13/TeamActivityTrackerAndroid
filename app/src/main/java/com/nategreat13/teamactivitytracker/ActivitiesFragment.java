@@ -142,6 +142,11 @@ public class ActivitiesFragment extends Fragment {
         }
     }
 
+    public void setTeam(Team team) {
+        this.team = team;
+        updateListView();
+    }
+
     public void updateListView() {
         Activity[] activities = team.getActivities();
 
@@ -192,7 +197,8 @@ public class ActivitiesFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        //super.onActivityResult(requestCode, resultCode, data);
+        updateListView();
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 if (profileType == ProfileType.Coach) {

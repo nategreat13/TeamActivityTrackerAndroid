@@ -94,7 +94,7 @@ public class HomeActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams params = view.getLayoutParams();
 
                 // Set the height of the Item View
-                params.height = 250;
+                params.height = 168;
                 view.setLayoutParams(params);
 
                 return view;
@@ -208,6 +208,47 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
+                        String cid = coachIDs[position];
+                        String coachName = coaches.get(cid);
+                        new AlertDialog.Builder(activity)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("Delete Coach?")
+                                .setMessage("Are you sure you want to delete " + coachName + "? THIS CANNOT BE UNDONE")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        db.getNumberOfTeamsForCoach(cid, numberOfTeams -> {
+                                            if (numberOfTeams <= 0) {
+                                                db.deleteCoach(cid, user.getUid(), success -> {
+                                                    if (success) {
+                                                        db.getUser(user.getUid(), updatedUser -> {
+                                                            setUser(updatedUser);
+                                                        });
+                                                    }
+                                                    else {
+                                                        new AlertDialog.Builder(activity)
+                                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                                .setTitle("Error")
+                                                                .setMessage("Error deleting coach")
+                                                                .setNegativeButton("Ok", null)
+                                                                .show();
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                new AlertDialog.Builder(activity)
+                                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                                        .setTitle("Cannot delete coach")
+                                                        .setMessage("Cannot delete coach because they are a part of at least one team. Please remove them from all teams and try again.")
+                                                        .setNegativeButton("Ok", null)
+                                                        .show();
+                                            }
+                                        });
+                                    }
+                                })
+                                .setNegativeButton("No", null)
+                                .show();
                         break;
                 }
                 // false : close the menu; true : not close the menu
@@ -228,7 +269,7 @@ public class HomeActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams params = view.getLayoutParams();
 
                 // Set the height of the Item View
-                params.height = 250;
+                params.height = 168;
                 view.setLayoutParams(params);
 
                 return view;
@@ -377,6 +418,7 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
+        /*
         int totalHeight = 0;
         for (int i = 0; i < listAdapter.getCount(); i++) {
             View listItem = listAdapter.getView(i, null, listView);
@@ -388,14 +430,14 @@ public class HomeActivity extends AppCompatActivity {
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
+        */
 
-        /*
-        int totalHeight = listAdapter.getCount() * 250;
+
+        int totalHeight = listAdapter.getCount() * 168;
 
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
-        */
     }
 }

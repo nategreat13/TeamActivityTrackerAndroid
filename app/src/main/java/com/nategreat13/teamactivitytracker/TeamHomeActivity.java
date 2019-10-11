@@ -44,6 +44,8 @@ public class TeamHomeActivity extends AppCompatActivity {
     private boolean firstLoad = true;
     private boolean isOnHomeFragment = true;
     private boolean isOnLeaderboardFragment = false;
+    private boolean isOnActivitiesFragment = false;
+    private boolean isOnRosterFragment = false;
     private BottomNavigationView navView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -58,24 +60,32 @@ public class TeamHomeActivity extends AppCompatActivity {
                     loadFragment(fragment);
                     isOnHomeFragment = true;
                     isOnLeaderboardFragment = false;
+                    isOnActivitiesFragment = false;
+                    isOnRosterFragment = false;
                     return true;
                 case R.id.navigation_leaderboard:
                     fragment = LeaderboardFragment.newInstance(team);
                     loadFragment(fragment);
                     isOnHomeFragment = false;
                     isOnLeaderboardFragment = true;
+                    isOnActivitiesFragment = false;
+                    isOnRosterFragment = false;
                     return true;
                 case R.id.navigation_activities:
                     fragment = ActivitiesFragment.newInstance(team, profileType, player, coach);
                     loadFragment(fragment);
                     isOnHomeFragment = false;
                     isOnLeaderboardFragment = false;
+                    isOnActivitiesFragment = true;
+                    isOnRosterFragment = false;
                     return true;
                 case R.id.navigation_roster:
                     fragment = RosterFragment.newInstance(team);
                     loadFragment(fragment);
                     isOnHomeFragment = false;
                     isOnLeaderboardFragment = false;
+                    isOnActivitiesFragment = false;
+                    isOnRosterFragment = true;
                     return true;
             }
             return false;
@@ -195,6 +205,24 @@ public class TeamHomeActivity extends AppCompatActivity {
                 return;
             }
         }
+        if (isOnActivitiesFragment) {
+            try {
+                ActivitiesFragment activitiesFragment = (ActivitiesFragment) fragment;
+                activitiesFragment.setTeam(team);
+            }
+            catch (Exception e) {
+                return;
+            }
+        }
+        if (isOnRosterFragment) {
+            try {
+                RosterFragment rosterFragment = (RosterFragment) fragment;
+                rosterFragment.setTeam(team);
+            }
+            catch (Exception e) {
+                return;
+            }
+        }
     }
 
     public ArrayList<CompletedActivity> getCompletedActivities() {
@@ -239,6 +267,9 @@ public class TeamHomeActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (isOnActivitiesFragment) {
+            navView.getMenu().getItem(2).setChecked(true);
+        }
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 boolean deletedTeam = data.getBooleanExtra("DELETED_TEAM", false);

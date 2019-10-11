@@ -1,6 +1,7 @@
 package com.nategreat13.teamactivitytracker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.nategreat13.teamactivitytracker.Model.Activity;
