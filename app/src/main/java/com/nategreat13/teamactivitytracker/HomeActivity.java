@@ -3,6 +3,7 @@ package com.nategreat13.teamactivitytracker;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -19,6 +20,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -41,13 +47,16 @@ public class HomeActivity extends AppCompatActivity {
     private DB db;
     private User user = new User();
 
-    private SwipeMenuListView listPlayers;
-    private SwipeMenuListView listCoaches;
-    ArrayAdapter<String> adapterPlayers;
-    ArrayAdapter<String> adapterCoaches;
+    private RecyclerView listPlayers;
+    private RecyclerView listCoaches;
+    com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter adapterPlayers;
+    com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter adapterCoaches;
 
     private TextView playersTextView;
     private TextView coachesTextView;
+
+    private SwipeController playerSwipeController;
+    private SwipeController coachSwipeController;
 
     HashMap<String, String> players;
     String[] playerIDs;
@@ -83,211 +92,54 @@ public class HomeActivity extends AppCompatActivity {
 
         ArrayList<String> playerValues = new ArrayList<>();
 
-        adapterPlayers = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, android.R.id.text1, playerValues) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent){
-                // Get the current item from ListView
-                View view = super.getView(position,convertView,parent);
-
-                // Get the Layout Parameters for ListView Current Item View
-                ViewGroup.LayoutParams params = view.getLayoutParams();
-
-                // Set the height of the Item View
-                params.height = 168;
-                view.setLayoutParams(params);
-
-                return view;
-            }
-        };
-
-        // Assign adapter to ListView
+        listPlayers = findViewById(R.id.listPlayers);
+        listPlayers.setLayoutManager(new LinearLayoutManager(this));
+        adapterPlayers = new com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter(this, playerValues);
+        adapterPlayers.setClickListener(this::onPlayerClick);
         listPlayers.setAdapter(adapterPlayers);
+        listPlayers.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
 
-        // ListView Item Click Listener
-        listPlayers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        playerSwipeController = new SwipeController(new SwipeControllerActions() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                playerSelected(position);
-            }
-
-        });
-
-        SwipeMenuCreator creator = new SwipeMenuCreator() {
-
-            @Override
-            public void create(SwipeMenu menu) {
-                // create "delete" item
-                SwipeMenuItem deleteItem = new SwipeMenuItem(
-                        getApplicationContext());
-                // set item background
-                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-                        0x3F, 0x25)));
-                // set item width
-                deleteItem.setWidth(300);
-                // set item title
-                deleteItem.setTitle("Delete");
-                // set item title fontsize
-                deleteItem.setTitleSize(18);
-                // set item title font color
-                deleteItem.setTitleColor(Color.WHITE);
-                // add to menu
-                menu.addMenuItem(deleteItem);
-            }
-        };
-
-        // set creator
-        listPlayers.setMenuCreator(creator);
-
-        // Left
-        listPlayers.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-
-        listPlayers.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                switch (index) {
-                    case 0:
-                        String pid = playerIDs[position];
-                        String playerName = players.get(pid);
-                        new AlertDialog.Builder(activity)
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setTitle("Delete Player?")
-                            .setMessage("Are you sure you want to delete " + playerName + "? THIS CANNOT BE UNDONE")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    db.getNumberOfTeamsForPlayer(pid, numberOfTeams -> {
-                                        if (numberOfTeams <= 0) {
-                                            db.deletePlayer(pid, user.getUid(), success -> {
-                                                if (success) {
-                                                    db.getUser(user.getUid(), updatedUser -> {
-                                                        setUser(updatedUser);
-                                                    });
-                                                }
-                                                else {
-                                                    new AlertDialog.Builder(activity)
-                                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                                        .setTitle("Error")
-                                                        .setMessage("Error deleting player")
-                                                        .setNegativeButton("Ok", null)
-                                                        .show();
-                                                }
-                                            });
-                                        }
-                                        else {
-                                            new AlertDialog.Builder(activity)
-                                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                                    .setTitle("Cannot delete player")
-                                                    .setMessage("Cannot delete player because they are a part of at least one team. Please remove them from all teams and try again.")
-                                                    .setNegativeButton("Ok", null)
-                                                    .show();
-                                        }
-                                    });
-                                }
-                            })
-                            .setNegativeButton("No", null)
-                            .show();
-                        break;
-                }
-                // false : close the menu; true : not close the menu
-                return false;
+            public void onRightClicked(int position) {
+                deletePlayer(position);
             }
         });
 
-        // set creator
-        listCoaches.setMenuCreator(creator);
+        ItemTouchHelper playerItemTouchhelper = new ItemTouchHelper(playerSwipeController);
+        playerItemTouchhelper.attachToRecyclerView(listPlayers);
 
-        // Left
-        listCoaches.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-
-        listCoaches.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+        listPlayers.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                switch (index) {
-                    case 0:
-                        String cid = coachIDs[position];
-                        String coachName = coaches.get(cid);
-                        new AlertDialog.Builder(activity)
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setTitle("Delete Coach?")
-                                .setMessage("Are you sure you want to delete " + coachName + "? THIS CANNOT BE UNDONE")
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        db.getNumberOfTeamsForCoach(cid, numberOfTeams -> {
-                                            if (numberOfTeams <= 0) {
-                                                db.deleteCoach(cid, user.getUid(), success -> {
-                                                    if (success) {
-                                                        db.getUser(user.getUid(), updatedUser -> {
-                                                            setUser(updatedUser);
-                                                        });
-                                                    }
-                                                    else {
-                                                        new AlertDialog.Builder(activity)
-                                                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                                                .setTitle("Error")
-                                                                .setMessage("Error deleting coach")
-                                                                .setNegativeButton("Ok", null)
-                                                                .show();
-                                                    }
-                                                });
-                                            }
-                                            else {
-                                                new AlertDialog.Builder(activity)
-                                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                                        .setTitle("Cannot delete coach")
-                                                        .setMessage("Cannot delete coach because they are a part of at least one team. Please remove them from all teams and try again.")
-                                                        .setNegativeButton("Ok", null)
-                                                        .show();
-                                            }
-                                        });
-                                    }
-                                })
-                                .setNegativeButton("No", null)
-                                .show();
-                        break;
-                }
-                // false : close the menu; true : not close the menu
-                return false;
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                playerSwipeController.onDraw(c);
             }
         });
 
         ArrayList<String> coachValues = new ArrayList<>();
 
-        adapterCoaches = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, android.R.id.text1, coachValues) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent){
-                // Get the current item from ListView
-                View view = super.getView(position,convertView,parent);
-
-                // Get the Layout Parameters for ListView Current Item View
-                ViewGroup.LayoutParams params = view.getLayoutParams();
-
-                // Set the height of the Item View
-                params.height = 168;
-                view.setLayoutParams(params);
-
-                return view;
-            }
-        };
-
-        // Assign adapter to ListView
+        listCoaches = findViewById(R.id.listCoaches);
+        listCoaches.setLayoutManager(new LinearLayoutManager(this));
+        adapterCoaches = new com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter(this, coachValues);
+        adapterCoaches.setClickListener(this::onCoachClick);
         listCoaches.setAdapter(adapterCoaches);
+        listCoaches.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
 
-        // ListView Item Click Listener
-        listCoaches.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        coachSwipeController = new SwipeController(new SwipeControllerActions() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                coachSelected(position);
+            public void onRightClicked(int position) {
+                deleteCoach(position);
             }
+        });
 
+        ItemTouchHelper coachItemTouchhelper = new ItemTouchHelper(coachSwipeController);
+        coachItemTouchhelper.attachToRecyclerView(listCoaches);
+
+        listCoaches.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                coachSwipeController.onDraw(c);
+            }
         });
     }
 
@@ -322,9 +174,6 @@ public class HomeActivity extends AppCompatActivity {
         coachIDs = coaches.keySet().toArray(new String[coaches.size()]);
         Arrays.sort(coachIDs);
 
-        adapterPlayers.clear();
-        adapterCoaches.clear();
-
         ArrayList<String> playerValues = new ArrayList<>();
         ArrayList<String> coachValues = new ArrayList<>();
 
@@ -334,14 +183,19 @@ public class HomeActivity extends AppCompatActivity {
         for (int j = 0; j < coachIDs.length; j++) {
             coachValues.add(coaches.get(coachIDs[j]) + " (Coach)");
         }
-        adapterPlayers.addAll(playerValues);
+        adapterPlayers.setList(playerValues);
         adapterPlayers.notifyDataSetChanged();
 
-        adapterCoaches.addAll(coachValues);
+        adapterCoaches.setList(coachValues);
         adapterCoaches.notifyDataSetChanged();
+    }
 
-        setListViewHeightBasedOnChildren(listPlayers);
-        setListViewHeightBasedOnChildren(listCoaches);
+    public void onPlayerClick(View view, int position) {
+        playerSelected(position);
+    }
+
+    public void onCoachClick(View view, int position) {
+        coachSelected(position);
     }
 
     public void playerSelected(int index) {
@@ -360,6 +214,94 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra("PROFILE_TYPE", "Coach");
         intent.putExtra("CID", cid);
         startActivity(intent);
+    }
+
+    public void deletePlayer(int position) {
+        String pid = playerIDs[position];
+        String playerName = players.get(pid);
+        new AlertDialog.Builder(activity)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Delete Player?")
+                .setMessage("Are you sure you want to delete " + playerName + "? THIS CANNOT BE UNDONE")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        db.getNumberOfTeamsForPlayer(pid, numberOfTeams -> {
+                            if (numberOfTeams <= 0) {
+                                db.deletePlayer(pid, user.getUid(), success -> {
+                                    if (success) {
+                                        db.getUser(user.getUid(), updatedUser -> {
+                                            setUser(updatedUser);
+                                        });
+                                    }
+                                    else {
+                                        new AlertDialog.Builder(activity)
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .setTitle("Error")
+                                                .setMessage("Error deleting player")
+                                                .setNegativeButton("Ok", null)
+                                                .show();
+                                    }
+                                });
+                            }
+                            else {
+                                new AlertDialog.Builder(activity)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setTitle("Cannot delete player")
+                                        .setMessage("Cannot delete player because they are a part of at least one team. Please remove them from all teams and try again.")
+                                        .setNegativeButton("Ok", null)
+                                        .show();
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    public void deleteCoach(int position) {
+        String cid = coachIDs[position];
+        String coachName = coaches.get(cid);
+        new AlertDialog.Builder(activity)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Delete Coach?")
+                .setMessage("Are you sure you want to delete " + coachName + "? THIS CANNOT BE UNDONE")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        db.getNumberOfTeamsForCoach(cid, numberOfTeams -> {
+                            if (numberOfTeams <= 0) {
+                                db.deleteCoach(cid, user.getUid(), success -> {
+                                    if (success) {
+                                        db.getUser(user.getUid(), updatedUser -> {
+                                            setUser(updatedUser);
+                                        });
+                                    }
+                                    else {
+                                        new AlertDialog.Builder(activity)
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .setTitle("Error")
+                                                .setMessage("Error deleting coach")
+                                                .setNegativeButton("Ok", null)
+                                                .show();
+                                    }
+                                });
+                            }
+                            else {
+                                new AlertDialog.Builder(activity)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setTitle("Cannot delete coach")
+                                        .setMessage("Cannot delete coach because they are a part of at least one team. Please remove them from all teams and try again.")
+                                        .setNegativeButton("Ok", null)
+                                        .show();
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     @Override
@@ -409,35 +351,5 @@ public class HomeActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
-    }
-
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
-
-        /*
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
-        */
-
-
-        int totalHeight = listAdapter.getCount() * 168;
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
     }
 }

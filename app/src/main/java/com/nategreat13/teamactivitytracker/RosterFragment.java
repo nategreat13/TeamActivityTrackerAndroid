@@ -1,10 +1,11 @@
+/// This class was found on a tutorial at https://codeburst.io/android-swipe-menu-with-recyclerview-8f28a235ff28#ed30
+/// The code for this was taken from https://github.com/FanFataL/swipe-controller-demo/blob/master/app/src/main/java/pl/fanfatal/swipecontrollerdemo/MainActivity.java
+
 package com.nategreat13.teamactivitytracker;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,27 +18,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.baoyz.swipemenulistview.SwipeMenu;
-import com.baoyz.swipemenulistview.SwipeMenuCreator;
-import com.baoyz.swipemenulistview.SwipeMenuItem;
-import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.nategreat13.teamactivitytracker.Model.DB;
-import com.nategreat13.teamactivitytracker.Model.Player;
-import com.nategreat13.teamactivitytracker.Model.ProfileType;
 import com.nategreat13.teamactivitytracker.Model.Team;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,9 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE;
-
-public class RosterFragment extends Fragment implements com.nategreat13.teamactivitytracker.RosterAdapter.ItemClickListener {
+public class RosterFragment extends Fragment implements com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter.ItemClickListener {
 
     private Team team;
     private List<Map.Entry<String, String>> playersSorted;
@@ -59,11 +46,9 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
     private TextView coachesTextView;
 
     private DB db;
-    //private ArrayAdapter<String> playerAdapter;
-    //private ArrayAdapter<String> coachAdapter;
 
-    private com.nategreat13.teamactivitytracker.RosterAdapter coachAdapter;
-    private com.nategreat13.teamactivitytracker.RosterAdapter playerAdapter;
+    private com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter coachAdapter;
+    private com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter playerAdapter;
     private SwipeController swipeController;
 
     public RosterFragment() {
@@ -96,7 +81,7 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
 
         listPlayers = getActivity().findViewById(R.id.listPlayers);
         listPlayers.setLayoutManager(new LinearLayoutManager(getActivity()));
-        playerAdapter = new com.nategreat13.teamactivitytracker.RosterAdapter(getActivity(), playerValues);
+        playerAdapter = new com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter(getActivity(), playerValues);
         playerAdapter.setClickListener(this::onPlayerClick);
         listPlayers.setAdapter(playerAdapter);
         listPlayers.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayout.VERTICAL));
@@ -127,7 +112,7 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
 
         listCoaches = getActivity().findViewById(R.id.listCoaches);
         listCoaches.setLayoutManager(new LinearLayoutManager(getActivity()));
-        coachAdapter = new com.nategreat13.teamactivitytracker.RosterAdapter(getActivity(), coachValues);
+        coachAdapter = new com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter(getActivity(), coachValues);
         coachAdapter.setClickListener(this);
         listCoaches.setAdapter(coachAdapter);
         listCoaches.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayout.VERTICAL));

@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder> {
+public class BasicRecyclerViewAdapter extends RecyclerView.Adapter<BasicRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<String> list;
     private LayoutInflater inflater;
     private ItemClickListener clickListener;
 
     // data is passed into the constructor
-    RosterAdapter(Context context, ArrayList<String> data) {
+    BasicRecyclerViewAdapter(Context context, ArrayList<String> data) {
         this.inflater = LayoutInflater.from(context);
         this.list = data;
     }

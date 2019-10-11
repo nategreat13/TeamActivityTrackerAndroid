@@ -3,6 +3,7 @@ package com.nategreat13.teamactivitytracker;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -15,11 +16,16 @@ import com.nategreat13.teamactivitytracker.Model.ProfileType;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -42,8 +48,8 @@ public class ProfileActivity extends AppCompatActivity {
     private HashMap<String, String> teams;
     private Activity activity;
 
-    private SwipeMenuListView listView;
-    ArrayAdapter<String> adapter;
+    private RecyclerView listView;
+    com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,134 +78,27 @@ public class ProfileActivity extends AppCompatActivity {
 
         ArrayList<String> values = new ArrayList<>();
 
-        adapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, android.R.id.text1, values) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent){
-                // Get the current item from ListView
-                View view = super.getView(position,convertView,parent);
-
-                // Get the Layout Parameters for ListView Current Item View
-                ViewGroup.LayoutParams params = view.getLayoutParams();
-
-                // Set the height of the Item View
-                params.height = 250;
-                view.setLayoutParams(params);
-
-                return view;
-            }
-        };
-
-        // Assign adapter to ListView
+        listView = findViewById(R.id.list);
+        listView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter(this, values);
+        adapter.setClickListener(this::onTeamClick);
         listView.setAdapter(adapter);
+        listView.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
 
-        // ListView Item Click Listener
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        SwipeController swipeController = new SwipeController(new SwipeControllerActions() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                teamSelected(position);
+            public void onRightClicked(int position) {
+                removeFromTeam(position);
             }
         });
 
-        SwipeMenuCreator creator = new SwipeMenuCreator() {
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+        itemTouchhelper.attachToRecyclerView(listView);
 
+        listView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
-            public void create(SwipeMenu menu) {
-                // create "delete" item
-                SwipeMenuItem deleteItem = new SwipeMenuItem(
-                        getApplicationContext());
-                // set item background
-                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-                        0x3F, 0x25)));
-                // set item width
-                deleteItem.setWidth(300);
-                // set item title
-                deleteItem.setTitle("Delete");
-                // set item title fontsize
-                deleteItem.setTitleSize(18);
-                // set item title font color
-                deleteItem.setTitleColor(Color.WHITE);
-                // add to menu
-                menu.addMenuItem(deleteItem);
-            }
-        };
-
-        // set creator
-        listView.setMenuCreator(creator);
-
-
-        // Left
-        listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-
-        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                switch (index) {
-                    case 0:
-                       if (profileType == ProfileType.Player) {
-                           String tid = teamIDs[position];
-                           new AlertDialog.Builder(activity)
-                                   .setIcon(android.R.drawable.ic_dialog_alert)
-                                   .setTitle("Remove player from team?")
-                                   .setMessage("Are you sure you want to remove " + player.getFirstName() + " " + player.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
-                                   .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                                   {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           db.removePlayerFromTeam(pid, tid, success -> {
-                                               if (success) {
-                                                   HashMap<String, String> newTeams = player.getTeams();
-                                                   newTeams.remove(tid);
-                                                   updateListView();
-                                               }
-                                               else {
-                                                   System.out.println("Fail");
-                                               }
-                                           });
-                                       }
-                                   })
-                                   .setNegativeButton("No", null)
-                                   .show();
-                       }
-                       else if (profileType == ProfileType.Coach) {
-                           String tid = teamIDs[position];
-                           new AlertDialog.Builder(activity)
-                               .setIcon(android.R.drawable.ic_dialog_alert)
-                               .setTitle("Remove coach from team?")
-                               .setMessage("Are you sure you want to remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
-                               .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                               {
-                                   @Override
-                                   public void onClick(DialogInterface dialog, int which) {
-                                       db.getNumberOfCoachesOnTeam(tid, numberOfCoaches -> {
-                                           if (numberOfCoaches > 1) {
-                                               db.removeCoachFromTeam(cid, tid, success -> {
-                                                   if (success) {
-                                                       HashMap<String, String> newTeams = coach.getTeams();
-                                                       newTeams.remove(tid);
-                                                       updateListView();
-                                                   }
-                                               });
-                                           }
-                                           else {
-                                               new AlertDialog.Builder(activity)
-                                                       .setIcon(android.R.drawable.ic_dialog_alert)
-                                                       .setTitle("Cannot remove coach")
-                                                       .setMessage("Cannot remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + " because they are the only coach on the team")
-                                                       .setNegativeButton("Ok", null)
-                                                       .show();
-                                           }
-                                       });
-                                   }
-                               })
-                               .setNegativeButton("No", null)
-                               .show();
-                       }
-                       break;
-                }
-                // false : close the menu; true : not close the menu
-                return false;
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                swipeController.onDraw(c);
             }
         });
     }
@@ -233,15 +132,17 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        adapter.clear();
-
         ArrayList<String> values = new ArrayList<>();
 
         for (int i = 0; i < teamIDs.length; i++) {
             values.add(teams.get(teamIDs[i]));
         }
-        adapter.addAll(values);
+        adapter.setList(values);
         adapter.notifyDataSetChanged();
+    }
+
+    public void onTeamClick(View view, int position) {
+        teamSelected(position);
     }
 
     public void teamSelected(int index) {
@@ -258,6 +159,66 @@ public class ProfileActivity extends AppCompatActivity {
             }
             intent.putExtra("TEAM_ID", tid);
             startActivityForResult(intent, 1);
+        }
+    }
+
+    public void removeFromTeam(int position) {
+        if (profileType == ProfileType.Player) {
+            String tid = teamIDs[position];
+            new AlertDialog.Builder(activity)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Remove player from team?")
+                    .setMessage("Are you sure you want to remove " + player.getFirstName() + " " + player.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            db.removePlayerFromTeam(pid, tid, success -> {
+                                if (success) {
+                                    HashMap<String, String> newTeams = player.getTeams();
+                                    newTeams.remove(tid);
+                                    updateListView();
+                                }
+                                else {
+                                    System.out.println("Fail");
+                                }
+                            });
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
+        else if (profileType == ProfileType.Coach) {
+            String tid = teamIDs[position];
+            new AlertDialog.Builder(activity)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Remove coach from team?")
+                    .setMessage("Are you sure you want to remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + "? THIS CANNOT BE UNDONE")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            db.getNumberOfCoachesOnTeam(tid, numberOfCoaches -> {
+                                if (numberOfCoaches > 1) {
+                                    db.removeCoachFromTeam(cid, tid, success -> {
+                                        if (success) {
+                                            HashMap<String, String> newTeams = coach.getTeams();
+                                            newTeams.remove(tid);
+                                            updateListView();
+                                        }
+                                    });
+                                } else {
+                                    new AlertDialog.Builder(activity)
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .setTitle("Cannot remove coach")
+                                            .setMessage("Cannot remove " + coach.getFirstName() + " " + coach.getLastName() + " from " + teams.get(tid) + " because they are the only coach on the team")
+                                            .setNegativeButton("Ok", null)
+                                            .show();
+                                }
+                            });
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
         }
     }
 
