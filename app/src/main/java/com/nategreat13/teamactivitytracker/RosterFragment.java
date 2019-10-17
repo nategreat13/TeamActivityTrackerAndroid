@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nategreat13.teamactivitytracker.Model.DB;
+import com.nategreat13.teamactivitytracker.Model.ProfileType;
 import com.nategreat13.teamactivitytracker.Model.Team;
 
 import java.util.ArrayList;
@@ -51,14 +52,24 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
     private com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter playerAdapter;
     private SwipeController swipeController;
 
+    private ProfileType profileType =  ProfileType.Player;
+    private String pid;
+
     public RosterFragment() {
     }
 
     // TODO: Rename and change types and number of parameters
-    public static RosterFragment newInstance(Team team) {
+    public static RosterFragment newInstance(Team team, ProfileType profileType, String pid) {
         RosterFragment fragment = new RosterFragment();
         Bundle args = new Bundle();
         args.putSerializable("TEAM", team);
+        if (profileType == ProfileType.Coach) {
+            args.putString("PROFILE_TYPE", "COACH");
+        }
+        else {
+            args.putString("PROFILE_TYPE", "PLAYER");
+        }
+        args.putString("PID", pid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,9 +77,6 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        //listPlayers = getActivity().findViewById(R.id.listPlayers);
-        //listCoaches = getActivity().findViewById(R.id.listCoaches);
 
         db = new DB();
 
@@ -86,22 +94,24 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
         listPlayers.setAdapter(playerAdapter);
         listPlayers.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayout.VERTICAL));
 
-        swipeController = new SwipeController(new SwipeControllerActions() {
-            @Override
-            public void onRightClicked(int position) {
-                removePlayerFromTeam(position);
-            }
-        });
+        if (profileType ==  ProfileType.Coach) {
+            swipeController = new SwipeController(new SwipeControllerActions() {
+                @Override
+                public void onRightClicked(int position) {
+                    removePlayerFromTeam(position);
+                }
+            });
 
-        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
-        itemTouchhelper.attachToRecyclerView(listPlayers);
+            ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+            itemTouchhelper.attachToRecyclerView(listPlayers);
 
-        listPlayers.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-                swipeController.onDraw(c);
-            }
-        });
+            listPlayers.addItemDecoration(new RecyclerView.ItemDecoration() {
+                @Override
+                public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                    swipeController.onDraw(c);
+                }
+            });
+        }
 
         ArrayList<String> coachValues = new ArrayList<>();
 
@@ -133,6 +143,9 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
 
         if (getArguments() != null) {
             team = (Team) getArguments().getSerializable("TEAM");
+            String profileTypeString = getArguments().getString("PROFILE_TYPE");
+            profileType = profileTypeString.equals("COACH") ? ProfileType.Coach : ProfileType.Player;
+            pid = getArguments().getString("PID");
         }
     }
 
@@ -145,11 +158,14 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
 
     public void playerSelected(int index) {
         String pid = playersSorted.get(index).getKey();
-        Intent intent = new Intent(getActivity(), PlayerDetailActivity.class);
-        intent.putExtra("TID", team.getTid());
-        intent.putExtra("PID", pid);
-        intent.putExtra("PLAYER_NAME", playersSorted.get(index).getValue());
-        startActivity(intent);
+        if (profileType == ProfileType.Coach || this.pid.equals(pid))
+        {
+            Intent intent = new Intent(getActivity(), PlayerDetailActivity.class);
+            intent.putExtra("TID", team.getTid());
+            intent.putExtra("PID", pid);
+            intent.putExtra("PLAYER_NAME", playersSorted.get(index).getValue());
+            startActivity(intent);
+        }
     }
 
     public void setTeam(Team team) {

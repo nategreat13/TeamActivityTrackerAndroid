@@ -80,7 +80,8 @@ public class TeamHomeActivity extends AppCompatActivity {
                     isOnRosterFragment = false;
                     return true;
                 case R.id.navigation_roster:
-                    fragment = RosterFragment.newInstance(team);
+                    String pid = profileType == ProfileType.Player ? player.getPid() : "";
+                    fragment = RosterFragment.newInstance(team, profileType, pid);
                     loadFragment(fragment);
                     isOnHomeFragment = false;
                     isOnLeaderboardFragment = false;
@@ -268,7 +269,14 @@ public class TeamHomeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (isOnActivitiesFragment) {
-            navView.getMenu().getItem(2).setChecked(true);
+
+            try {
+                ActivitiesFragment activitiesFragment = (ActivitiesFragment) fragment;
+                activitiesFragment.onHiddenChanged(false);
+            }
+            catch (Exception e) {
+                return;
+            }
         }
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {

@@ -12,8 +12,10 @@ public class Activity implements Serializable {
     private String tid;
     private int limit;
     private LimitPeriod limitPeriod;
+    private boolean isHidden;
+    private boolean coachAssigned;
 
-    public Activity(String aid, String name, String description, int points, String tid, int limit, LimitPeriod limitPeriod) {
+    public Activity(String aid, String name, String description, int points, String tid, int limit, LimitPeriod limitPeriod, boolean isHidden, boolean coachAssigned) {
         this.aid = aid;
         this.name = name;
         this.description = description;
@@ -21,6 +23,8 @@ public class Activity implements Serializable {
         this.tid = tid;
         this.limit = limit;
         this.limitPeriod = limitPeriod;
+        this.isHidden = isHidden;
+        this.coachAssigned = coachAssigned;
     }
 
     public String getAid() {
@@ -77,5 +81,21 @@ public class Activity implements Serializable {
 
     public void setLimitPeriod(LimitPeriod limitPeriod) {
         this.limitPeriod = limitPeriod;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        isHidden = hidden;
+    }
+
+    public boolean isCoachAssigned() {
+        return coachAssigned;
+    }
+
+    public void setCoachAssigned(boolean coachAssigned) {
+        this.coachAssigned = coachAssigned;
     }
 }

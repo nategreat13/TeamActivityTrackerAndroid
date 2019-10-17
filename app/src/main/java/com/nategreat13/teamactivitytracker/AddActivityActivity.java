@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -37,6 +38,8 @@ public class AddActivityActivity extends AppCompatActivity {
     private Spinner limitSelector;
     private Button addActivityButton;
     private TextView errorLabel;
+    private CheckBox hideFromTeamCheckBox;
+    private CheckBox assignedByCoachCheckBox;
     private boolean isEdit = false;
 
     @Override
@@ -58,6 +61,8 @@ public class AddActivityActivity extends AppCompatActivity {
         limitTextField = findViewById(R.id.limitTextField);
         pointsTextField = findViewById(R.id.pointsTextField);
         limitSelector = findViewById(R.id.limitSelector);
+        hideFromTeamCheckBox = findViewById(R.id.hideFromTeamCheckBox);
+        assignedByCoachCheckBox = findViewById(R.id.assignedByCoachCheckBox);
         addActivityButton = findViewById(R.id.addActivityButton);
         errorLabel = findViewById(R.id.errorLabel);
 
@@ -68,7 +73,6 @@ public class AddActivityActivity extends AppCompatActivity {
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, list);
         limitSelector.setAdapter(dataAdapter);
-        limitSelector.setOnItemSelectedListener(new CustomOnItemSelectedListener());
 
         if (isEdit) {
             activityToEdit = (Activity) getIntent().getSerializableExtra("ACTIVITY");
@@ -86,6 +90,8 @@ public class AddActivityActivity extends AppCompatActivity {
                 case month:
                     limitSelector.setSelection(2, true);
             }
+            hideFromTeamCheckBox.setChecked(activityToEdit.isHidden());
+            assignedByCoachCheckBox.setChecked(activityToEdit.isCoachAssigned());
             addActivityButton.setText(R.string.edit_activity);
             getSupportActionBar().setTitle(R.string.edit_activity);
         }
@@ -152,12 +158,8 @@ public class AddActivityActivity extends AppCompatActivity {
             limitPeriod = LimitPeriod.month;
         }
         if (!isEdit) {
-            db.addActivity(activityName, activityDescription, points, tid, limit, limitPeriod, activity -> {
+            db.addActivity(activityName, activityDescription, points, tid, limit, limitPeriod, hideFromTeamCheckBox.isChecked(), assignedByCoachCheckBox.isChecked(), activity -> {
                 if (activity != null) {
-                    Intent intent = new Intent();
-                    intent.putExtra("ACTIVITY", activity);
-                    intent.putExtra("TYPE", "Add");
-                    setResult(android.app.Activity.RESULT_OK, intent);
                     finish();
                 }
                 else {
@@ -166,12 +168,8 @@ public class AddActivityActivity extends AppCompatActivity {
             });
         }
         else {
-            db.editActivity(new Activity(activityToEdit.getAid(), activityName, activityDescription, points, tid, limit, limitPeriod), activity -> {
+            db.editActivity(new Activity(activityToEdit.getAid(), activityName, activityDescription, points, tid, limit, limitPeriod, hideFromTeamCheckBox.isChecked(), assignedByCoachCheckBox.isChecked()), activity -> {
                 if (activity != null) {
-                    Intent intent = new Intent();
-                    intent.putExtra("ACTIVITY", activity);
-                    intent.putExtra("TYPE", "Edit");
-                    setResult(android.app.Activity.RESULT_OK, intent);
                     finish();
                 }
                 else {
@@ -205,20 +203,5 @@ public class AddActivityActivity extends AppCompatActivity {
             InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(activity.getWindow().getDecorView().getWindowToken(), 0);
         }
-    }
-
-    private class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
-            Toast.makeText(parent.getContext(),
-                    "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> arg0) {
-            // TODO Auto-generated method stub
-        }
-
     }
 }

@@ -6,6 +6,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.nategreat13.teamactivitytracker.Model.Activity;
@@ -37,7 +41,8 @@ public class ActivitiesFragment extends Fragment {
     private FrameLayout layout;
     private FloatingActionButton fab;
     private int indexActivity;
-    ArrayAdapter<String> adapter;
+    private RecyclerView listView;
+    com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter adapter;
 
     public ActivitiesFragment() {
     }
@@ -72,7 +77,7 @@ public class ActivitiesFragment extends Fragment {
             fab.hide();
         }
 
-        ListView listView = getActivity().findViewById(R.id.list);
+        listView = getActivity().findViewById(R.id.list);
 
         Activity[] activities = team.getActivities();
 
@@ -89,37 +94,15 @@ public class ActivitiesFragment extends Fragment {
             values.add(activities[i].getPoints() + " - " + activities[i].getName());
         }
 
-        adapter = new ArrayAdapter<String>
-                (getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, values) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent){
-                // Get the current item from ListView
-                View view = super.getView(position,convertView,parent);
-
-                // Get the Layout Parameters for ListView Current Item View
-                ViewGroup.LayoutParams params = view.getLayoutParams();
-
-                // Set the height of the Item View
-                params.height = 125;
-                view.setLayoutParams(params);
-
-                return view;
-            }
-        };
-
-        // Assign adapter to ListView
+        listView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adapter = new com.nategreat13.teamactivitytracker.BasicRecyclerViewAdapter(getActivity(), values);
+        adapter.setClickListener(this::onActivityClick);
         listView.setAdapter(adapter);
+        listView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayout.VERTICAL));
+    }
 
-        // ListView Item Click Listener
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                activitySelected(position);
-            }
-
-        });
+    public void onActivityClick(View view, int position) {
+        activitySelected(position);
     }
 
     public void activitySelected(int position) {
@@ -130,7 +113,7 @@ public class ActivitiesFragment extends Fragment {
             intent.putExtra("PID", player.getPid());
             intent.putExtra("PLAYER_NAME", player.getFirstName() + " " + player.getLastName());
             intent.putExtra("ACTIVITY", team.getActivities()[position]);
-            startActivityForResult(intent, 1);
+            startActivity(intent);
         }
         else {
             indexActivity = position;
@@ -138,7 +121,7 @@ public class ActivitiesFragment extends Fragment {
             intent.putExtra("TID", team.getTid());
             intent.putExtra("ACTIVITY", team.getActivities()[position]);
             intent.putExtra("ISEDIT", true);
-            startActivityForResult(intent, 1);
+            startActivity(intent);
         }
     }
 
@@ -150,15 +133,13 @@ public class ActivitiesFragment extends Fragment {
     public void updateListView() {
         Activity[] activities = team.getActivities();
 
-        adapter.clear();
-
         ArrayList<String> values = new ArrayList<>();
 
         for (int i = 0; i < activities.length; i++) {
             values.add(activities[i].getPoints() + " - " + activities[i].getName());
         }
 
-        adapter.addAll(values);
+        adapter.setList(values);
         adapter.notifyDataSetChanged();
     }
 
@@ -192,21 +173,6 @@ public class ActivitiesFragment extends Fragment {
     public void goToAddActivity(View view) {
         Intent intent = new Intent(getActivity(), AddActivityActivity.class);
         intent.putExtra("TID", team.getTid());
-        startActivityForResult(intent, 1);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-        updateListView();
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                if (profileType == ProfileType.Coach) {
-                    String type = data.getStringExtra("TYPE");
-                    Activity activity = (Activity) data.getSerializableExtra("ACTIVITY");
-                    updateListView();
-                }
-            }
-        }
+        startActivity(intent);
     }
 }

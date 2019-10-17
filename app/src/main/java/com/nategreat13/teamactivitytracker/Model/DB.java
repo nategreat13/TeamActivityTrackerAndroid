@@ -681,7 +681,9 @@ public class DB {
                     if (limitPeriod.equals("Month")) {
                         limitPeriodEnumVal = LimitPeriod.month;
                     }
-                    activities[i] = (new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal));
+                    Boolean isHidden = (Boolean) data.get("IsHidden");
+                    Boolean coachAssigned = (Boolean) data.get("CoachAssigned");
+                    activities[i] = (new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal, isHidden, coachAssigned));
                     i++;
                 }
                 activitiesCallback.onCallbackActivities(activities);
@@ -710,7 +712,7 @@ public class DB {
 
     // Activity Functions
 
-    public void addActivity(String name, String description, int points, String tid, int limit, LimitPeriod limitPeriod, ActivityCallback activityCallback) {
+    public void addActivity(String name, String description, int points, String tid, int limit, LimitPeriod limitPeriod, Boolean isHidden, Boolean coachAssigned, ActivityCallback activityCallback) {
         String limitPeriodString = "Day";
         if (limitPeriod == LimitPeriod.week) {
             limitPeriodString = "Week";
@@ -726,6 +728,8 @@ public class DB {
         data.put("tid", tid);
         data.put("Limit", limit);
         data.put("LimitPeriod", limitPeriodString);
+        data.put("IsHidden", isHidden);
+        data.put("CoachAssigned", coachAssigned);
 
         getNextId(NextIDType.activity, nextID -> {
             if (nextID != -1) {
@@ -736,7 +740,7 @@ public class DB {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 setNextID(NextIDType.activity, nextID + 1);
-                                activityCallback.onCallbackActivity(new Activity(aid, name, description, points, tid, limit, limitPeriod));
+                                activityCallback.onCallbackActivity(new Activity(aid, name, description, points, tid, limit, limitPeriod, isHidden, coachAssigned));
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -765,6 +769,8 @@ public class DB {
         data.put("tid", activity.getTid());
         data.put("Limit", activity.getLimit());
         data.put("LimitPeriod", limitPeriodString);
+        data.put("IsHidden", activity.isHidden());
+        data.put("CoachAssigned", activity.isCoachAssigned());
 
         db.collection("Activities").document(activity.getAid())
                 .update(data)
@@ -791,6 +797,8 @@ public class DB {
         activityData.put("Name", activity.getName());
         activityData.put("Description", activity.getDescription());
         activityData.put("Points", activity.getPoints());
+        activityData.put("IsHidden", activity.isHidden());
+        activityData.put("CoachAssigned", activity.isCoachAssigned());
 
         HashMap<String, Object> data = new HashMap<>();
         data.put("Activity", activityData);
@@ -875,6 +883,14 @@ public class DB {
                                 String name = activityData.get("Name").toString();
                                 String description = activityData.get("Description").toString();
                                 int points = Integer.parseInt(activityData.get("Points").toString());
+                                Boolean isHidden = (Boolean) activityData.get("IsHidden");
+                                if (isHidden == null) {
+                                    isHidden = false;
+                                }
+                                Boolean coachAssigned = (Boolean) activityData.get("CoachAssigned");
+                                if (coachAssigned == null) {
+                                    coachAssigned = false;
+                                }
                                 String pid = completedActivityData.get("pid").toString();
                                 String tid = completedActivityData.get("tid").toString();
                                 int quantity = Integer.parseInt(completedActivityData.get("Quantity").toString());
@@ -882,7 +898,7 @@ public class DB {
                                 String playerName = completedActivityData.get("PlayerName").toString();
                                 Long dateLong = Long.parseLong(completedActivityData.get("Date").toString());
                                 Date date = new Date(dateLong*1000);
-                                Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day);
+                                Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day, isHidden, coachAssigned);
                                 CompletedActivity completedActivity = new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, date);
                                 completedActivities.add(completedActivity);
                             }
@@ -910,6 +926,14 @@ public class DB {
                                 String name = activityData.get("Name").toString();
                                 String description = activityData.get("Description").toString();
                                 int points = Integer.parseInt(activityData.get("Points").toString());
+                                Boolean isHidden = (Boolean) activityData.get("IsHidden");
+                                if (isHidden == null) {
+                                    isHidden = false;
+                                }
+                                Boolean coachAssigned = (Boolean) activityData.get("CoachAssigned");
+                                if (coachAssigned == null) {
+                                    coachAssigned = false;
+                                }
                                 String pid = completedActivityData.get("pid").toString();
                                 String tid = completedActivityData.get("tid").toString();
                                 int quantity = Integer.parseInt(completedActivityData.get("Quantity").toString());
@@ -917,7 +941,7 @@ public class DB {
                                 String playerName = completedActivityData.get("PlayerName").toString();
                                 Long dateLong = Long.parseLong(completedActivityData.get("Date").toString());
                                 Date date = new Date(dateLong*1000);
-                                Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day);
+                                Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day, isHidden, coachAssigned);
                                 CompletedActivity completedActivity = new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, date);
                                 completedActivities.add(completedActivity);
                             }
@@ -1059,13 +1083,21 @@ public class DB {
                     int limit = Integer.parseInt(data.get("Limit").toString());
                     String limitPeriod = data.get("LimitPeriod").toString();
                     LimitPeriod limitPeriodEnumVal = LimitPeriod.day;
+                    Boolean isHidden = (Boolean) data.get("IsHidden");
+                    if (isHidden == null) {
+                        isHidden = false;
+                    }
+                    Boolean coachAssigned = (Boolean) data.get("CoachAssigned");
+                    if (coachAssigned == null) {
+                        coachAssigned = false;
+                    }
                     if (limitPeriod.equals("Week")) {
                         limitPeriodEnumVal = LimitPeriod.week;
                     }
                     if (limitPeriod.equals("Month")) {
                         limitPeriodEnumVal = LimitPeriod.month;
                     }
-                    activities[i] = (new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal));
+                    activities[i] = (new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal, isHidden, coachAssigned));
                     i++;
                 }
                 activitiesCallback.onCallbackActivities(activities);
@@ -1093,6 +1125,14 @@ public class DB {
                             String name = activityData.get("Name").toString();
                             String description = activityData.get("Description").toString();
                             int points = Integer.parseInt(activityData.get("Points").toString());
+                            Boolean isHidden = (Boolean) activityData.get("IsHidden");
+                            if (isHidden == null) {
+                                isHidden = false;
+                            }
+                            Boolean coachAssigned = (Boolean) activityData.get("CoachAssigned");
+                            if (coachAssigned == null) {
+                                coachAssigned = false;
+                            }
                             String pid = completedActivityData.get("pid").toString();
                             String tid = completedActivityData.get("tid").toString();
                             int quantity = Integer.parseInt(completedActivityData.get("Quantity").toString());
@@ -1100,7 +1140,7 @@ public class DB {
                             String playerName = completedActivityData.get("PlayerName").toString();
                             Long dateLong = Long.parseLong(completedActivityData.get("Date").toString());
                             Date date = new Date(dateLong*1000);
-                            Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day);
+                            Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day, isHidden, coachAssigned);
                             CompletedActivity completedActivity = new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, date);
                             completedActivities.add(completedActivity);
                         }
