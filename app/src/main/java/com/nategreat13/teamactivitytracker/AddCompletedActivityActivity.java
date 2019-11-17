@@ -128,7 +128,7 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
 
         timePeriodStart = timePeriodStart/1000;
 
-        db.getNumberOfCompletedActtivitiesSinceTime(pid, activity.getAid(), timePeriodStart, value -> {
+        db.getNumberOfCompletedActivitiesSinceTime(pid, activity.getAid(), timePeriodStart, value -> {
             if (value >= activity.getLimit()) {
                 errorLabel.setText(R.string.period_limit_reached);
             }

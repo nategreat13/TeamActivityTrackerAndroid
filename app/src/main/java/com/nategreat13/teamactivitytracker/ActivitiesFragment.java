@@ -82,7 +82,7 @@ public class ActivitiesFragment extends Fragment {
         Activity[] activities = team.getActivities();
 
         if (activities.length == 0) {
-            db.getTeamActivities(team.getTid(), teamActivities -> {
+            db.getTeamActivities(team.getTid(), profileType, teamActivities -> {
                 team.setActivities(teamActivities);
                 updateListView();
             });

@@ -1,11 +1,13 @@
 package com.nategreat13.teamactivitytracker;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.nategreat13.teamactivitytracker.Model.CompletedActivity;
 import com.nategreat13.teamactivitytracker.Model.DB;
+import com.nategreat13.teamactivitytracker.Model.ProfileType;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +43,8 @@ public class PlayerDetailActivity extends AppCompatActivity {
     private Button filterButton;
     private ListView completedActivitiesListView;
     private ArrayAdapter completedActivitiesAdapter;
+    private FloatingActionButton addButton;
+    private ProfileType profileType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +59,17 @@ public class PlayerDetailActivity extends AppCompatActivity {
         tid = getIntent().getStringExtra("TID");
         pid = getIntent().getStringExtra("PID");
         playerName = getIntent().getStringExtra("PLAYER_NAME");
+        profileType = getIntent().getStringExtra("PROFILE_TYPE").equals("Coach") ? ProfileType.Coach : ProfileType.Player;
 
         getSupportActionBar().setTitle(playerName);
 
         filterButton = findViewById(R.id.filterButton);
         filterSpinner = findViewById(R.id.filterSpinner);
         completedActivitiesListView = findViewById(R.id.completedActivitiesListView);
+        addButton = findViewById(R.id.fab);
+        if (profileType == ProfileType.Player) {
+            addButton.setVisibility(View.INVISIBLE);
+        }
 
         List<String> list = new ArrayList<String>();
         list.add("Day");
@@ -138,6 +147,19 @@ public class PlayerDetailActivity extends AppCompatActivity {
             };
             completedActivitiesListView.setAdapter(completedActivitiesAdapter);
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        filterButtonPressed(filterButton);
+    }
+
+    public void goToAddCoachAssignedCompletedActivity(View view) {
+        Intent intent = new Intent(this, AddCoachAssignedCompletedActivity.class);
+        intent.putExtra("PID", pid);
+        intent.putExtra("PLAYER_NAME", playerName);
+        startActivityForResult(intent, 1);
     }
 
     @Override

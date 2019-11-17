@@ -92,4 +92,6 @@
     <string name="title_activity_player_detail">PlayerDetailActivity</string>
     <string name="hide_from_team">Hide from team when completed</string>
     <string name="assigned_by_coach">Assigned by coach</string>
+    <string name="title_activity_add_coach_assigned_completed">AddCoachAssignedCompletedActivity</string>
+    <string name="select_an_activity">Please select an Activity</string>
 </resources>

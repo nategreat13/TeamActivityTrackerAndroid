@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorSecondary"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".AddCoachAssignedCompletedActivity"
+    tools:showIn="@layout/activity_add_coach_assigned_completed">
+
+    <Spinner
+        android:id="@+id/activitySpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/activityNameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/activitySpinner">
+
+        <TextView
+            android:id="@+id/nameTextView"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/activity_name" />
+
+        <TextView
+            android:id="@+id/nameTextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activityDescriptionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activityNameLayout">
+
+        <TextView
+            android:id="@+id/descriptionTextView"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/activity_description" />
+
+        <TextView
+            android:id="@+id/descriptionTextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:ellipsize="end"
+            android:maxLines="3" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activityPointsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activityDescriptionLayout">
+
+        <TextView
+            android:id="@+id/pointsTextView"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/points" />
+
+        <TextView
+            android:id="@+id/pointsTextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activityLimitLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activityPointsLayout">
+
+        <TextView
+            android:id="@+id/limitTextView"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/limit" />
+
+        <TextView
+            android:id="@+id/limitTextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activityQuantityLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activityLimitLayout">
+
+        <TextView
+            android:id="@+id/quantityTextView"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/quantity" />
+
+        <EditText
+            android:id="@+id/quantityTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:inputType="number|textPersonName" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/commentTextField"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:hint="@string/comment_optional"
+        android:inputType="textPersonName"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activityQuantityLayout" />
+
+    <Button
+        android:id="@+id/completeActivityButton"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_horizontal|center_vertical"
+        android:onClick="completeActivity"
+        android:text="@string/complete_activity"
+        android:textColor="@color/colorSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/commentTextField" />
+
+    <TextView
+        android:id="@+id/errorLabel"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="center_horizontal"
+        android:textColor="#F44336"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/completeActivityButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

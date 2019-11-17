@@ -164,6 +164,7 @@ public class RosterFragment extends Fragment implements com.nategreat13.teamacti
             intent.putExtra("TID", team.getTid());
             intent.putExtra("PID", pid);
             intent.putExtra("PLAYER_NAME", playersSorted.get(index).getValue());
+            intent.putExtra("PROFILE_TYPE", profileType == ProfileType.Coach ? "Coach" : "Player");
             startActivity(intent);
         }
     }

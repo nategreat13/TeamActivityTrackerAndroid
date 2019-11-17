@@ -657,15 +657,13 @@ public class DB {
         });
     }
 
-    public void getTeamActivities(String tid, ActivitiesCallback activitiesCallback) {
+    public void getTeamActivities(String tid, ProfileType profileType, ActivitiesCallback activitiesCallback) {
         Query query = db.collection("Activities").whereEqualTo("tid", tid);
 
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                Activity[] activities = new Activity[queryDocumentSnapshots.getDocuments().size()];
-                int i = 0;
+                ArrayList<Activity> activities = new ArrayList<>();
                 for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
                     Map<String, Object> data = snapshot.getData();
                     String aid = snapshot.getId();
@@ -683,10 +681,14 @@ public class DB {
                     }
                     Boolean isHidden = (Boolean) data.get("IsHidden");
                     Boolean coachAssigned = (Boolean) data.get("CoachAssigned");
-                    activities[i] = (new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal, isHidden, coachAssigned));
-                    i++;
+                    if (profileType == ProfileType.Coach || !coachAssigned) {
+                        activities.add(new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal, isHidden, coachAssigned));
+                    }
+                    Activity[] activitiesArray = new Activity[activities.size()];
+                    activitiesArray = activities.toArray(activitiesArray);
+                    activitiesCallback.onCallbackActivities(activitiesArray);
                 }
-                activitiesCallback.onCallbackActivities(activities);
+                activitiesCallback.onCallbackActivities((Activity[]) activities.toArray());
             }
         });
     }
@@ -953,7 +955,7 @@ public class DB {
                 });
     }
 
-    public void getNumberOfCompletedActtivitiesSinceTime(String pid, String aid, long time, IntCallback intCallback) {
+    public void getNumberOfCompletedActivitiesSinceTime(String pid, String aid, long time, IntCallback intCallback) {
         db.collection("CompletedActivities").whereEqualTo("pid", pid).whereEqualTo("Activity.aid", aid).whereGreaterThan("Date", time).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -1064,7 +1066,7 @@ public class DB {
         });
     }
 
-    public void listenForTeamActivities(String tid, ActivitiesCallback activitiesCallback) {
+    public void listenForTeamActivities(String tid, ProfileType profileType, ActivitiesCallback activitiesCallback) {
         db.collection("Activities").whereEqualTo("tid", tid).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value,
@@ -1072,8 +1074,7 @@ public class DB {
                 if (e != null) {
                     return;
                 }
-                Activity[] activities = new Activity[value.getDocuments().size()];
-                int i = 0;
+                ArrayList<Activity> activities = new ArrayList<>();
                 for (QueryDocumentSnapshot document : value) {
                     Map<String, Object> data = document.getData();
                     String aid = document.getId();
@@ -1097,16 +1098,19 @@ public class DB {
                     if (limitPeriod.equals("Month")) {
                         limitPeriodEnumVal = LimitPeriod.month;
                     }
-                    activities[i] = (new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal, isHidden, coachAssigned));
-                    i++;
+                    if (profileType == ProfileType.Coach || !coachAssigned) {
+                        activities.add(new Activity(aid, name, description, points, tid, limit, limitPeriodEnumVal, isHidden, coachAssigned));
+                    }
                 }
-                activitiesCallback.onCallbackActivities(activities);
+                Activity[] activitiesArray = new Activity[activities.size()];
+                activitiesArray = activities.toArray(activitiesArray);
+                activitiesCallback.onCallbackActivities(activitiesArray);
             }
         });
     }
 
     public void listenForCompletedActivites(String tid, CompletedActivitiesCallback completedActivitiesCallback) {
-        db.collection("CompletedActivities").whereEqualTo("tid", tid).orderBy("Date", Query.Direction.DESCENDING).limit(10)
+        db.collection("CompletedActivities").whereEqualTo("tid", tid).orderBy("Date", Query.Direction.DESCENDING).limit(15)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
@@ -1142,7 +1146,9 @@ public class DB {
                             Date date = new Date(dateLong*1000);
                             Activity activity = new Activity(aid, name, description, points, tid, 0, LimitPeriod.day, isHidden, coachAssigned);
                             CompletedActivity completedActivity = new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, date);
-                            completedActivities.add(completedActivity);
+                            if (!isHidden) {
+                                completedActivities.add(completedActivity);
+                            }
                         }
                         completedActivitiesCallback.onCallbackCompletedActivities(completedActivities);
                     }

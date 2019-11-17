@@ -127,6 +127,7 @@ public class TeamHomeActivity extends AppCompatActivity {
         }
         String tid = getIntent().getStringExtra("TEAM_ID");
         listenForTeamUpdates(tid);
+        listenForTeamActivityUpdates(tid);
         listenForCompletedActivities(tid);
     }
 
@@ -157,14 +158,13 @@ public class TeamHomeActivity extends AppCompatActivity {
     }
 
     public void listenForTeamUpdates(String tid) {
-        db.listenForTeam(tid, updatedTeam -> setTeam(updatedTeam));
-        listenForTeamActivityUpdates(tid);
+        db.listenForTeam(tid, updatedTeam -> setTeam(updatedTeam, false));
     }
 
     public void listenForTeamActivityUpdates(String tid) {
-        db.listenForTeamActivities(tid, activities -> {
+        db.listenForTeamActivities(tid, profileType, activities -> {
             team.setActivities(activities);
-            setTeam(team);
+            setTeam(team, true);
         });
     }
 
@@ -176,7 +176,10 @@ public class TeamHomeActivity extends AppCompatActivity {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void setTeam(Team team, boolean updatedActivities) {
+        if (!updatedActivities && this.team != null) {
+            team.setActivities(this.team.getActivities());
+        }
         this.team = team;
         Globals.currentTeam = team;
         if (!team.getShowLeaderboard()) {

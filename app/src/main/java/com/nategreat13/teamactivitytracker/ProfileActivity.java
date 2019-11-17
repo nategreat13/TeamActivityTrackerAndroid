@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import com.nategreat13.teamactivitytracker.Model.Coach;
 import com.nategreat13.teamactivitytracker.Model.DB;
+import com.nategreat13.teamactivitytracker.Model.Globals;
 import com.nategreat13.teamactivitytracker.Model.Player;
 import com.nategreat13.teamactivitytracker.Model.ProfileType;
 
@@ -101,6 +102,11 @@ public class ProfileActivity extends AppCompatActivity {
                 swipeController.onDraw(c);
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
