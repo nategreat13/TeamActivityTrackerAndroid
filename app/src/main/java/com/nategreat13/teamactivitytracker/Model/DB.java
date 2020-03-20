@@ -712,6 +712,42 @@ public class DB {
                 });
     }
 
+    public void resetAllTeamPoints(String tid, BooleanCallback booleanCallback) {
+        getTeam(tid, team -> {
+            if (team == null) {
+                booleanCallback.onCallbackBoolean(false);
+            }
+            else {
+                HashMap<String, String> players = team.getPlayers();
+                HashMap<String, Long> tempPlayerPoints = new HashMap<>();
+                if (players.size() > 0)
+                {
+                    String[] pids = new String[players.size()];
+                    System.arraycopy(players.keySet().toArray(), 0, pids, 0, pids.length);
+                    for (int i = 0; i < pids.length; i++) {
+                        tempPlayerPoints.put(pids[i], 0L);
+                    }
+                }
+                HashMap<String, Object> data = new HashMap<>();
+                data.put("PlayerPoints", tempPlayerPoints);
+                data.put("PlayerPeriodPoints", tempPlayerPoints);
+                db.collection("Teams").document(tid).update(data)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                booleanCallback.onCallbackBoolean(true);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                booleanCallback.onCallbackBoolean(false);
+                            }
+                        });
+            }
+        });
+    }
+
     // Activity Functions
 
     public void addActivity(String name, String description, int points, String tid, int limit, LimitPeriod limitPeriod, Boolean isHidden, Boolean coachAssigned, ActivityCallback activityCallback) {

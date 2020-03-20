@@ -176,23 +176,30 @@ public class AddTeamActivity extends AppCompatActivity {
     }
 
     public void createTeam(String tid, String teamName, Boolean showFullLeaderboard) {
-        db.addTeam(tid, teamName, coach.getCid(), coach.getFirstName() + " " + coach.getLastName(), showFullLeaderboard, team -> {
-            if (team == null) {
-                errorLabel.setText(R.string.error_creating_team);
-            }
-            else {
-                db.addTeamToCoach(tid, teamName, coach.getCid(), success -> {
-                    if (success) {
-                        coach.addTeam(team.getTid(), team.getName());
-                        Intent intent = new Intent();
-                        intent.putExtra("COACH", coach);
-                        setResult(Activity.RESULT_OK, intent);
-                        finish();
-                    }
-                    else {
+        db.findTeam(tid, name -> {
+            if (name == null) {
+                db.addTeam(tid, teamName, coach.getCid(), coach.getFirstName() + " " + coach.getLastName(), showFullLeaderboard, team -> {
+                    if (team == null) {
                         errorLabel.setText(R.string.error_creating_team);
                     }
+                    else {
+                        db.addTeamToCoach(tid, teamName, coach.getCid(), success -> {
+                            if (success) {
+                                coach.addTeam(team.getTid(), team.getName());
+                                Intent intent = new Intent();
+                                intent.putExtra("COACH", coach);
+                                setResult(Activity.RESULT_OK, intent);
+                                finish();
+                            }
+                            else {
+                                errorLabel.setText(R.string.error_creating_team);
+                            }
+                        });
+                    }
                 });
+            }
+            else {
+                errorLabel.setText(R.string.team_id_already_exists);
             }
         });
     }

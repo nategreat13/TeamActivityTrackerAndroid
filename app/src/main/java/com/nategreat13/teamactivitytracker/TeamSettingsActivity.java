@@ -44,28 +44,46 @@ public class TeamSettingsActivity extends AppCompatActivity {
         db = new DB();
     }
 
-    public void deleteTeam(View view) {
+    public void resetPoints(View view) {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Remove player from team?")
-                .setMessage("Are you sure you want to delete " + team.getName() + "? THIS CANNOT BE UNDONE")
+                .setTitle("Reset Points?")
+                .setMessage("Are you sure you want to reset all of the points for this team? THIS CANNOT BE UNDONE")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        db.deleteTeam(team, success -> {
-                            if (success) {
-                                Intent intent = new Intent();
-                                intent.putExtra("DELETED_TEAM", true);
-                                intent.putExtra("DELETED_TID", team.getTid());
-                                setResult(Activity.RESULT_OK, intent);
-                                finish();
-                            }
+                        db.resetAllTeamPoints(team.getTid(), success -> {
+                            boolean didWork = success;
                         });
                     }
                 })
                 .setNegativeButton("No", null)
                 .show();
+    }
+
+    public void deleteTeam(View view) {
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Remove player from team?")
+                    .setMessage("Are you sure you want to delete " + team.getName() + "? THIS CANNOT BE UNDONE")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            db.deleteTeam(team, success -> {
+                                if (success) {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("DELETED_TEAM", true);
+                                    intent.putExtra("DELETED_TID", team.getTid());
+                                    setResult(Activity.RESULT_OK, intent);
+                                    finish();
+                                }
+                            });
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
     }
 
     @Override
