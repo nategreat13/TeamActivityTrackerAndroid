@@ -259,9 +259,12 @@ public class TeamHomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(this, TeamSettingsActivity.class);
-                intent.putExtra("TEAM", team);
-                startActivityForResult(intent, 1);
+                if (profileType == ProfileType.Coach) {
+                    Intent intent = new Intent(this, TeamSettingsActivity.class);
+                    intent.putExtra("TEAM", team);
+                    startActivityForResult(intent, 1);
+                    return true;
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
