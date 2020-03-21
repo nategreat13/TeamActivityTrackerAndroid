@@ -89,6 +89,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void forgotPasswordClicked(View view) {
+        Intent intent = new Intent(this, ResetPasswordActivity.class);
+        startActivity(intent);
+    }
+
     public static boolean isValidEmail(CharSequence target) {
         return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
     }

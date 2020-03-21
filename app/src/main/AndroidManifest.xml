@@ -11,10 +11,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ResetPasswordActivity"></activity>
         <activity
             android:name=".AddCoachAssignedCompletedActivity"
             android:label="@string/title_activity_add_coach_assigned_completed"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PlayerDetailActivity"
             android:label="@string/title_activity_player_detail"

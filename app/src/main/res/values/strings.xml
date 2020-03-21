@@ -96,4 +96,11 @@
     <string name="title_activity_add_coach_assigned_completed">AddCoachAssignedCompletedActivity</string>
     <string name="select_an_activity">Please select an Activity</string>
     <string name="team_id_already_exists">The Team ID already exists.</string>
+    <string name="title_activity_reset_password">ResetPasswordActivity</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="send_email">Send Reset Email</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="email_no_account">No account with that email</string>
+    <string name="email_sent">You should receive a password reset email. It may go to the junk folder.</string>
+    <string name="forgot_password">Forgot Password?</string>
 </resources>
