@@ -59,6 +59,8 @@
     <string name="edit_activity">Edit Actvity</string>
     <string name="activity_name">Name:</string>
     <string name="activity_description">Description:</string>
+    <string name="activity_url">URL (Optional):</string>
+    <string name="complete_activity_url">URL:</string>
     <string name="title_activity_add_activity">AddActivityActivity</string>
     <string name="activity_name_required">Name Required</string>
     <string name="activity_description_required">Description Required</string>

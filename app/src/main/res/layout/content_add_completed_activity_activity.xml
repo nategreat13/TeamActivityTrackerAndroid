@@ -69,7 +69,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/activityPointsLayout"
+        android:id="@+id/activityURLLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="30dp"
@@ -80,6 +80,36 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activityDescriptionLayout">
+
+        <TextView
+            android:id="@+id/urlTextView"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/complete_activity_url" />
+
+        <TextView
+            android:id="@+id/urlTextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:ellipsize="end"
+            android:maxLines="3" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activityPointsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activityURLLayout">
 
         <TextView
             android:id="@+id/pointsTextView"
@@ -120,6 +150,7 @@
             android:id="@+id/limitTextViewValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textIsSelectable="true"
             android:layout_weight="0" />
 
     </LinearLayout>

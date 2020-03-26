@@ -33,6 +33,7 @@ public class AddActivityActivity extends AppCompatActivity {
     private Activity activityToEdit;
     private EditText activityNameTextField;
     private TextView activityDescriptionTextView;
+    private TextView activityURLTextView;
     private EditText limitTextField;
     private EditText pointsTextField;
     private Spinner limitSelector;
@@ -58,6 +59,7 @@ public class AddActivityActivity extends AppCompatActivity {
 
         activityNameTextField = findViewById(R.id.activityNameTextField);
         activityDescriptionTextView = findViewById(R.id.activityDescriptionTextView);
+        activityURLTextView = findViewById(R.id.activityURLTextView);
         limitTextField = findViewById(R.id.limitTextField);
         pointsTextField = findViewById(R.id.pointsTextField);
         limitSelector = findViewById(R.id.limitSelector);
@@ -78,6 +80,7 @@ public class AddActivityActivity extends AppCompatActivity {
             activityToEdit = (Activity) getIntent().getSerializableExtra("ACTIVITY");
             activityNameTextField.setText(activityToEdit.getName());
             activityDescriptionTextView.setText(activityToEdit.getDescription());
+            activityURLTextView.setText(activityToEdit.getUrl());
             limitTextField.setText(Integer.toString(activityToEdit.getLimit()));
             pointsTextField.setText(Integer.toString(activityToEdit.getPoints()));
             switch (activityToEdit.getLimitPeriod()) {
@@ -115,6 +118,7 @@ public class AddActivityActivity extends AppCompatActivity {
             errorLabel.setText(getString(R.string.activity_description_required));
             return;
         }
+        String activityURL = activityURLTextView.getText().toString();
         String pointsString = pointsTextField.getText().toString();
         if (pointsString.length() == 0) {
             errorLabel.setText(getString(R.string.activity_points_required));
@@ -158,7 +162,7 @@ public class AddActivityActivity extends AppCompatActivity {
             limitPeriod = LimitPeriod.month;
         }
         if (!isEdit) {
-            db.addActivity(activityName, activityDescription, points, tid, limit, limitPeriod, hideFromTeamCheckBox.isChecked(), assignedByCoachCheckBox.isChecked(), activity -> {
+            db.addActivity(activityName, activityDescription, points, tid, limit, limitPeriod, hideFromTeamCheckBox.isChecked(), assignedByCoachCheckBox.isChecked(), activityURL, activity -> {
                 if (activity != null) {
                     finish();
                 }
@@ -168,7 +172,7 @@ public class AddActivityActivity extends AppCompatActivity {
             });
         }
         else {
-            db.editActivity(new Activity(activityToEdit.getAid(), activityName, activityDescription, points, tid, limit, limitPeriod, hideFromTeamCheckBox.isChecked(), assignedByCoachCheckBox.isChecked()), activity -> {
+            db.editActivity(new Activity(activityToEdit.getAid(), activityName, activityDescription, points, tid, limit, limitPeriod, hideFromTeamCheckBox.isChecked(), assignedByCoachCheckBox.isChecked(), activityURL), activity -> {
                 if (activity != null) {
                     finish();
                 }

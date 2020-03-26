@@ -10,6 +10,9 @@ import com.nategreat13.teamactivitytracker.Model.DB;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -51,6 +54,17 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
 
         TextView activityDescriptionTextView = findViewById(R.id.descriptionTextViewValue);
         activityDescriptionTextView.setText(activity.getDescription());
+
+        TextView activityURLTextView = findViewById(R.id.urlTextViewValue);
+        if (!activity.getUrl().equals("")) {
+            activityURLTextView.setMovementMethod(LinkMovementMethod.getInstance());
+            String urlString = "<a href='" + activity.getUrl() + "'>" + activity.getUrl() + "</a>";
+            Spanned url = Html.fromHtml(urlString);
+            activityURLTextView.setText(url);
+        }
+        else {
+            activityURLTextView.setText("");
+        }
 
         TextView activityPointsTextView = findViewById(R.id.pointsTextViewValue);
         activityPointsTextView.setText(Integer.toString(activity.getPoints()));
