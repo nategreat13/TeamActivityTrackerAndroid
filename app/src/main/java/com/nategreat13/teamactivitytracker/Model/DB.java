@@ -693,7 +693,12 @@ public class DB {
                     activitiesArray = activities.toArray(activitiesArray);
                     activitiesCallback.onCallbackActivities(activitiesArray);
                 }
-                activitiesCallback.onCallbackActivities((Activity[]) activities.toArray());
+                if (activities.size() > 0) {
+                    activitiesCallback.onCallbackActivities((Activity[]) activities.toArray());
+                }
+                else {
+                    activitiesCallback.onCallbackActivities(new Activity[0]);
+                }
             }
         });
     }
