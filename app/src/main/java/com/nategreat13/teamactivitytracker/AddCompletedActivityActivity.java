@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Button;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +31,8 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
     private String playerName;
     private Activity activity;
     private TextView errorLabel;
+    private Button completeActivityButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,8 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
         pid = getIntent().getStringExtra("PID");
         playerName = getIntent().getStringExtra("PLAYER_NAME");
         activity = (Activity) getIntent().getSerializableExtra("ACTIVITY");
+
+        completeActivityButton = findViewById(R.id.completeActivityButton);
 
         TextView activityNameTextView = findViewById(R.id.nameTextViewValue);
         activityNameTextView.setText(activity.getName());
@@ -86,6 +91,7 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
     }
 
     public void completeActivity(View view) {
+        completeActivityButton.setEnabled(false);
         errorLabel.setText("");
         EditText quantityTextField = findViewById(R.id.quantityTextField);
         String quantityString = quantityTextField.getText().toString();
@@ -148,6 +154,7 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
             }
             else if (value + quantity > activity.getLimit()) {
                 errorLabel.setText((activity.getLimit() - value) + " before limit is reached");
+                completeActivityButton.setEnabled(true);
             }
             else {
                 db.addCompletedActivity(activity, System.currentTimeMillis()/1000, quantity, activity.getPoints() * quantity, comment, pid, tid, playerName, completedActivity -> {
@@ -156,6 +163,7 @@ public class AddCompletedActivityActivity extends AppCompatActivity {
                     }
                     else {
                         errorLabel.setText(R.string.error_completing_activity);
+                        completeActivityButton.setEnabled(true);
                     }
                 });
             }
