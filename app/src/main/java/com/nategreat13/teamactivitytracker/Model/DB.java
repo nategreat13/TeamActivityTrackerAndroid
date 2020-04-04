@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class DB {
 
@@ -107,32 +108,28 @@ public class DB {
         if (tid != "") {
             data.put(tid, teamName);
         }
+        String uuid = UUID.randomUUID().toString();
+        String pid = "P-" + uuid;
 
-        getNextId(NextIDType.player, nextID -> {
-            if (nextID != -1) {
-                String pid = "P-" + nextID;
-                db.collection("Players").document(pid)
-                        .set(data)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                setNextID(NextIDType.player, nextID + 1);
-                                if (tid == "") {
-                                    playerCallback.onCallbackPlayer(new Player(pid, firstName, lastName));
-                                }
-                                else {
-                                    playerCallback.onCallbackPlayer(new Player(pid, firstName, lastName, tid, teamName));
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                playerCallback.onCallbackPlayer(null);
-                            }
-                        });
-            }
-        });
+        db.collection("Players").document(pid)
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        if (tid == "") {
+                            playerCallback.onCallbackPlayer(new Player(pid, firstName, lastName));
+                        }
+                        else {
+                            playerCallback.onCallbackPlayer(new Player(pid, firstName, lastName, tid, teamName));
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        playerCallback.onCallbackPlayer(null);
+                    }
+                });
     }
 
     public void addPlayerToTeam(String tid, String pid, String playerName, BooleanCallback booleanCallback) {
@@ -329,32 +326,27 @@ public class DB {
         if (tid != "") {
             data.put(tid, teamName);
         }
-
-        getNextId(NextIDType.coach, nextID -> {
-            if (nextID != -1) {
-                String cid = "C-" + nextID;
-                db.collection("Coaches").document(cid)
-                        .set(data)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                setNextID(NextIDType.coach, nextID + 1);
-                                if (tid == "") {
-                                    coachCallback.onCallbackCoach(new Coach(cid, firstName, lastName));
-                                }
-                                else {
-                                    coachCallback.onCallbackCoach(new Coach(cid, firstName, lastName, tid, teamName));
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                coachCallback.onCallbackCoach(null);
-                            }
-                        });
-            }
-        });
+        String uuid = UUID.randomUUID().toString();
+        String cid = "C-" + uuid;
+        db.collection("Coaches").document(cid)
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        if (tid == "") {
+                            coachCallback.onCallbackCoach(new Coach(cid, firstName, lastName));
+                        }
+                        else {
+                            coachCallback.onCallbackCoach(new Coach(cid, firstName, lastName, tid, teamName));
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        coachCallback.onCallbackCoach(null);
+                    }
+                });
     }
 
     public void addCoachToTeam(String tid, String cid, String coachName, BooleanCallback booleanCallback) {
@@ -780,26 +772,22 @@ public class DB {
         data.put("IsHidden", isHidden);
         data.put("CoachAssigned", coachAssigned);
 
-        getNextId(NextIDType.activity, nextID -> {
-            if (nextID != -1) {
-                String aid = "A-" + nextID;
-                db.collection("Activities").document(aid)
-                        .set(data)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                setNextID(NextIDType.activity, nextID + 1);
-                                activityCallback.onCallbackActivity(new Activity(aid, name, description, points, tid, limit, limitPeriod, isHidden, coachAssigned, url));
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                activityCallback.onCallbackActivity(null);
-                            }
-                        });
-            }
-        });
+        String uuid = UUID.randomUUID().toString();
+        String aid = "A-" + uuid;
+        db.collection("Activities").document(aid)
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        activityCallback.onCallbackActivity(new Activity(aid, name, description, points, tid, limit, limitPeriod, isHidden, coachAssigned, url));
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        activityCallback.onCallbackActivity(null);
+                    }
+                });
     }
 
     public void editActivity(Activity activity, ActivityCallback activityCallback) {
@@ -861,43 +849,39 @@ public class DB {
         data.put("Quantity", quantity);
         data.put("PlayerName", playerName);
 
-        getNextId(NextIDType.completedActivity, nextID -> {
-            if (nextID != -1) {
-                String caid = "CA-" + nextID;
-                db.collection("CompletedActivities").document(caid)
-                        .set(data)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                setNextID(NextIDType.completedActivity, nextID + 1);
-                                try {
-                                    int currentPoints = Globals.currentTeam.getPlayerPoints().get(pid).intValue();
-                                    int newPoints = currentPoints + totalPoints;
+        String uuid = UUID.randomUUID().toString();
+        String caid = "CA-" + uuid;
+        db.collection("CompletedActivities").document(caid)
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        try {
+                            int currentPoints = Globals.currentTeam.getPlayerPoints().get(pid).intValue();
+                            int newPoints = currentPoints + totalPoints;
 
-                                    int currentPeriodPoints = Globals.currentTeam.getPlayerPeriodPoints().get(pid).intValue();
-                                    int newPeriodPoints = currentPeriodPoints + totalPoints;
+                            int currentPeriodPoints = Globals.currentTeam.getPlayerPeriodPoints().get(pid).intValue();
+                            int newPeriodPoints = currentPeriodPoints + totalPoints;
 
-                                    HashMap<String, Object> newPointsData = new HashMap<>();
-                                    newPointsData.put("PlayerPoints." + pid, newPoints);
-                                    newPointsData.put("PlayerPeriodPoints." + pid, newPeriodPoints);
-                                    db.collection("Teams").document(tid).update(newPointsData);
+                            HashMap<String, Object> newPointsData = new HashMap<>();
+                            newPointsData.put("PlayerPoints." + pid, newPoints);
+                            newPointsData.put("PlayerPeriodPoints." + pid, newPeriodPoints);
+                            db.collection("Teams").document(tid).update(newPointsData);
 
-                                    completedActivityCallback.onCallbackCompletedActivity(new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, new Date(date*1000)));
-                                }
-                                catch (Exception e) {
-                                    completedActivityCallback.onCallbackCompletedActivity(null);
-                                }
+                            completedActivityCallback.onCallbackCompletedActivity(new CompletedActivity(caid, activity, pid, tid, quantity, totalPoints, playerName, new Date(date*1000)));
+                        }
+                        catch (Exception e) {
+                            completedActivityCallback.onCallbackCompletedActivity(null);
+                        }
 
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                completedActivityCallback.onCallbackCompletedActivity(null);
-                            }
-                        });
-            }
-        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        completedActivityCallback.onCallbackCompletedActivity(null);
+                    }
+                });
     }
 
     public void deleteTeamCompletedActivities(String tid, BooleanCallback booleanCallback) {
@@ -1021,53 +1005,6 @@ public class DB {
                         }
                     }
                 });
-    }
-
-    // NextID Functions
-
-    public void setNextID(NextIDType nextIDType, int nextID) {
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("NextID", nextID);
-
-        db.collection("NextID").document(getNextIDStringFromEnum(nextIDType)).set(data);
-    }
-
-    public void getNextId(NextIDType nextIDType, NextIDCallback nextIDCallback) {
-        DocumentReference docRef = db.collection("NextID").document(getNextIDStringFromEnum(nextIDType));
-
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-
-                    if (document.exists()) {
-                        int nextID = document.getLong("NextID").intValue();
-                        nextIDCallback.onCallbackNextID(nextID);
-                    } else {
-                        nextIDCallback.onCallbackNextID(-1);
-                    }
-
-                } else {
-                    nextIDCallback.onCallbackNextID(-1);
-                }
-            }
-        });
-    }
-
-
-    public String getNextIDStringFromEnum(NextIDType type) {
-        switch (type) {
-            case activity:
-                return "Activity";
-            case coach:
-                return "Coach";
-            case completedActivity:
-                return "CompletedActivity";
-            case player:
-                return "Player";
-        }
-        return "";
     }
 
     // Listeners
@@ -1246,10 +1183,6 @@ public class DB {
 
     public interface CompletedActivityCallback {
         void onCallbackCompletedActivity(CompletedActivity completedActivity);
-    }
-
-    public interface NextIDCallback {
-        void onCallbackNextID(int nextID);
     }
 
     public interface BooleanCallback {
